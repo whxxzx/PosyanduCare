@@ -17,7 +17,9 @@ app.use(express.json())
 // =========================
 app.get('/api/test-db', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT 1 AS berhasil')
+    const [rows] = await db.query(
+      'SELECT 1 AS berhasil'
+    )
 
     res.json({
       berhasil: true,
@@ -35,10 +37,12 @@ app.get('/api/test-db', async (req, res) => {
   }
 })
 
-// =========================
-// GET SEMUA BALITA
-// =========================
-app.get('/api/balita', async (req, res) => {
+// =====================================================
+// GET SEMUA ANAK
+// /api/anak
+// /api/balita  -> tetap dipertahankan untuk frontend lama
+// =====================================================
+app.get(['/api/anak', '/api/balita'], async (req, res) => {
   try {
     const [rows] = await db.query(`
       SELECT
@@ -52,7 +56,7 @@ app.get('/api/balita', async (req, res) => {
         nama_ayah,
         nama_ibu,
         created_at
-      FROM balita
+      FROM anak
       ORDER BY id ASC
     `)
 
@@ -61,20 +65,22 @@ app.get('/api/balita', async (req, res) => {
       data: rows
     })
   } catch (error) {
-    console.error('GET Balita Error:', error)
+    console.error('GET Anak Error:', error)
 
     res.status(500).json({
       berhasil: false,
-      pesan: 'Gagal mengambil data balita.',
+      pesan: 'Gagal mengambil data anak.',
       error: error.message
     })
   }
 })
 
-// =========================
-// GET BALITA BERDASARKAN ID
-// =========================
-app.get('/api/balita/:id', async (req, res) => {
+// =====================================================
+// GET ANAK BERDASARKAN ID
+// /api/anak/:id
+// /api/balita/:id -> tetap dipertahankan
+// =====================================================
+app.get(['/api/anak/:id', '/api/balita/:id'], async (req, res) => {
   try {
     const { id } = req.params
 
@@ -91,7 +97,7 @@ app.get('/api/balita/:id', async (req, res) => {
         nama_ayah,
         nama_ibu,
         created_at
-      FROM balita
+      FROM anak
       WHERE id = ?
       `,
       [id]
@@ -100,7 +106,7 @@ app.get('/api/balita/:id', async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({
         berhasil: false,
-        pesan: 'Data balita tidak ditemukan.'
+        pesan: 'Data anak tidak ditemukan.'
       })
     }
 
@@ -109,20 +115,22 @@ app.get('/api/balita/:id', async (req, res) => {
       data: rows[0]
     })
   } catch (error) {
-    console.error('GET Balita Detail Error:', error)
+    console.error('GET Anak Detail Error:', error)
 
     res.status(500).json({
       berhasil: false,
-      pesan: 'Gagal mengambil detail balita.',
+      pesan: 'Gagal mengambil detail anak.',
       error: error.message
     })
   }
 })
 
-// =========================
-// TAMBAH BALITA
-// =========================
-app.post('/api/balita', async (req, res) => {
+// =====================================================
+// TAMBAH ANAK
+// /api/anak
+// /api/balita -> tetap dipertahankan
+// =====================================================
+app.post(['/api/anak', '/api/balita'], async (req, res) => {
   try {
     const {
       nama,
@@ -135,16 +143,22 @@ app.post('/api/balita', async (req, res) => {
       nama_ibu
     } = req.body
 
-    if (!nama || !jenis_kelamin || !tanggal_lahir || !alamat) {
+    if (
+      !nama ||
+      !jenis_kelamin ||
+      !tanggal_lahir ||
+      !alamat
+    ) {
       return res.status(400).json({
         berhasil: false,
-        pesan: 'Nama, jenis kelamin, tanggal lahir, dan alamat wajib diisi.'
+        pesan:
+          'Nama, jenis kelamin, tanggal lahir, dan alamat wajib diisi.'
       })
     }
 
     const [result] = await db.query(
       `
-      INSERT INTO balita
+      INSERT INTO anak
       (
         nama,
         jenis_kelamin,
@@ -171,24 +185,26 @@ app.post('/api/balita', async (req, res) => {
 
     res.status(201).json({
       berhasil: true,
-      pesan: 'Data balita berhasil ditambahkan.',
+      pesan: 'Data anak berhasil ditambahkan.',
       id: result.insertId
     })
   } catch (error) {
-    console.error('POST Balita Error:', error)
+    console.error('POST Anak Error:', error)
 
     res.status(500).json({
       berhasil: false,
-      pesan: 'Gagal menambahkan data balita.',
+      pesan: 'Gagal menambahkan data anak.',
       error: error.message
     })
   }
 })
 
-// =========================
-// UPDATE BALITA
-// =========================
-app.put('/api/balita/:id', async (req, res) => {
+// =====================================================
+// UPDATE ANAK
+// /api/anak/:id
+// /api/balita/:id -> tetap dipertahankan
+// =====================================================
+app.put(['/api/anak/:id', '/api/balita/:id'], async (req, res) => {
   try {
     const { id } = req.params
 
@@ -203,16 +219,22 @@ app.put('/api/balita/:id', async (req, res) => {
       nama_ibu
     } = req.body
 
-    if (!nama || !jenis_kelamin || !tanggal_lahir || !alamat) {
+    if (
+      !nama ||
+      !jenis_kelamin ||
+      !tanggal_lahir ||
+      !alamat
+    ) {
       return res.status(400).json({
         berhasil: false,
-        pesan: 'Nama, jenis kelamin, tanggal lahir, dan alamat wajib diisi.'
+        pesan:
+          'Nama, jenis kelamin, tanggal lahir, dan alamat wajib diisi.'
       })
     }
 
     const [result] = await db.query(
       `
-      UPDATE balita
+      UPDATE anak
       SET
         nama = ?,
         jenis_kelamin = ?,
@@ -240,145 +262,121 @@ app.put('/api/balita/:id', async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({
         berhasil: false,
-        pesan: 'Data balita tidak ditemukan.'
+        pesan: 'Data anak tidak ditemukan.'
       })
     }
 
     res.json({
       berhasil: true,
-      pesan: 'Data balita berhasil diperbarui.'
+      pesan: 'Data anak berhasil diperbarui.'
     })
   } catch (error) {
-    console.error('PUT Balita Error:', error)
+    console.error('PUT Anak Error:', error)
 
     res.status(500).json({
       berhasil: false,
-      pesan: 'Gagal memperbarui data balita.',
+      pesan: 'Gagal memperbarui data anak.',
       error: error.message
     })
   }
 })
 
-// =========================
-// HAPUS BALITA
-// =========================
-app.delete('/api/balita/:id', async (req, res) => {
+// =====================================================
+// HAPUS ANAK
+// /api/anak/:id
+// /api/balita/:id -> tetap dipertahankan
+// =====================================================
+app.delete(['/api/anak/:id', '/api/balita/:id'], async (req, res) => {
   try {
     const { id } = req.params
 
     const [result] = await db.query(
-      'DELETE FROM balita WHERE id = ?',
+      'DELETE FROM anak WHERE id = ?',
       [id]
     )
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
         berhasil: false,
-        pesan: 'Data balita tidak ditemukan.'
+        pesan: 'Data anak tidak ditemukan.'
       })
     }
 
     res.json({
       berhasil: true,
-      pesan: 'Data balita berhasil dihapus.'
+      pesan: 'Data anak berhasil dihapus.'
     })
   } catch (error) {
-    console.error('DELETE Balita Error:', error)
+    console.error('DELETE Anak Error:', error)
 
     res.status(500).json({
       berhasil: false,
-      pesan: 'Gagal menghapus data balita.',
+      pesan: 'Gagal menghapus data anak.',
       error: error.message
     })
   }
 })
 
-// =========================
-// GET PEMERIKSAAN BERDASARKAN BALITA
-// =========================
-app.get('/api/balita/:id/pemeriksaan', async (req, res) => {
-  try {
-    const { id } = req.params
+// =====================================================
+// GET PEMERIKSAAN ANAK
+// /api/anak/:id/pemeriksaan
+// /api/balita/:id/pemeriksaan -> tetap dipertahankan
+// =====================================================
+app.get(
+  ['/api/anak/:id/pemeriksaan', '/api/balita/:id/pemeriksaan'],
+  async (req, res) => {
+    try {
+      const { id } = req.params
 
-    const [rows] = await db.query(
-      `
-      SELECT
-        id,
-        balita_id,
-        tanggal_pemeriksaan,
-        bb,
-        tb,
-        lila,
-        lk,
-        imunisasi,
-        vitamin_a,
-        obat_cacing,
-        created_at
-      FROM pemeriksaan
-      WHERE balita_id = ?
-      ORDER BY tanggal_pemeriksaan DESC
-      `,
-      [id]
-    )
+      const [rows] = await db.query(
+        `
+        SELECT
+          id,
+          anak_id,
+          tanggal_pemeriksaan,
+          bb,
+          tb,
+          lila,
+          lk,
+          imunisasi,
+          vitamin_a,
+          obat_cacing,
+          created_at
+        FROM pemeriksaan
+        WHERE anak_id = ?
+        ORDER BY tanggal_pemeriksaan DESC
+        `,
+        [id]
+      )
 
-    res.json({
-      berhasil: true,
-      data: rows
-    })
-  } catch (error) {
-    console.error('GET Pemeriksaan Error:', error)
+      res.json({
+        berhasil: true,
+        data: rows
+      })
+    } catch (error) {
+      console.error('GET Pemeriksaan Error:', error)
 
-    res.status(500).json({
-      berhasil: false,
-      pesan: 'Gagal mengambil data pemeriksaan.',
-      error: error.message
-    })
+      res.status(500).json({
+        berhasil: false,
+        pesan: 'Gagal mengambil data pemeriksaan.',
+        error: error.message
+      })
+    }
   }
-})
+)
 
-// =========================
+// =====================================================
 // TAMBAH PEMERIKSAAN
-// =========================
-app.post('/api/balita/:id/pemeriksaan', async (req, res) => {
-  try {
-    const { id } = req.params
+// /api/anak/:id/pemeriksaan
+// /api/balita/:id/pemeriksaan -> tetap dipertahankan
+// =====================================================
+app.post(
+  ['/api/anak/:id/pemeriksaan', '/api/balita/:id/pemeriksaan'],
+  async (req, res) => {
+    try {
+      const { id } = req.params
 
-    const {
-      tanggal_pemeriksaan,
-      bb,
-      tb,
-      lila,
-      lk,
-      imunisasi,
-      vitamin_a,
-      obat_cacing
-    } = req.body
-
-    if (!tanggal_pemeriksaan) {
-      return res.status(400).json({
-        berhasil: false,
-        pesan: 'Tanggal pemeriksaan wajib diisi.'
-      })
-    }
-
-    // Pastikan balita tersedia
-    const [balita] = await db.query(
-      'SELECT id FROM balita WHERE id = ?',
-      [id]
-    )
-
-    if (balita.length === 0) {
-      return res.status(404).json({
-        berhasil: false,
-        pesan: 'Data balita tidak ditemukan.'
-      })
-    }
-
-    const [result] = await db.query(
-      `
-      INSERT INTO pemeriksaan
-      (
-        balita_id,
+      const {
         tanggal_pemeriksaan,
         bb,
         tb,
@@ -387,41 +385,77 @@ app.post('/api/balita/:id/pemeriksaan', async (req, res) => {
         imunisasi,
         vitamin_a,
         obat_cacing
+      } = req.body
+
+      if (!tanggal_pemeriksaan) {
+        return res.status(400).json({
+          berhasil: false,
+          pesan: 'Tanggal pemeriksaan wajib diisi.'
+        })
+      }
+
+      // Pastikan anak tersedia
+      const [anak] = await db.query(
+        'SELECT id FROM anak WHERE id = ?',
+        [id]
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        id,
-        tanggal_pemeriksaan,
-        bb ?? null,
-        tb ?? null,
-        lila ?? null,
-        lk ?? null,
-        imunisasi ?? false,
-        vitamin_a ?? false,
-        obat_cacing ?? false
-      ]
-    )
 
-    res.status(201).json({
-      berhasil: true,
-      pesan: 'Data pemeriksaan berhasil ditambahkan.',
-      id: result.insertId
-    })
-  } catch (error) {
-    console.error('POST Pemeriksaan Error:', error)
+      if (anak.length === 0) {
+        return res.status(404).json({
+          berhasil: false,
+          pesan: 'Data anak tidak ditemukan.'
+        })
+      }
 
-    res.status(500).json({
-      berhasil: false,
-      pesan: 'Gagal menambahkan pemeriksaan.',
-      error: error.message
-    })
+      const [result] = await db.query(
+        `
+        INSERT INTO pemeriksaan
+        (
+          anak_id,
+          tanggal_pemeriksaan,
+          bb,
+          tb,
+          lila,
+          lk,
+          imunisasi,
+          vitamin_a,
+          obat_cacing
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        [
+          id,
+          tanggal_pemeriksaan,
+          bb ?? null,
+          tb ?? null,
+          lila ?? null,
+          lk ?? null,
+          imunisasi ?? false,
+          vitamin_a ?? false,
+          obat_cacing ?? false
+        ]
+      )
+
+      res.status(201).json({
+        berhasil: true,
+        pesan: 'Data pemeriksaan berhasil ditambahkan.',
+        id: result.insertId
+      })
+    } catch (error) {
+      console.error('POST Pemeriksaan Error:', error)
+
+      res.status(500).json({
+        berhasil: false,
+        pesan: 'Gagal menambahkan pemeriksaan.',
+        error: error.message
+      })
+    }
   }
-})
+)
 
-// =========================
+// =====================================================
 // UPDATE PEMERIKSAAN
-// =========================
+// =====================================================
 app.put('/api/pemeriksaan/:id', async (req, res) => {
   try {
     const { id } = req.params
@@ -493,9 +527,9 @@ app.put('/api/pemeriksaan/:id', async (req, res) => {
   }
 })
 
-// =========================
+// =====================================================
 // HAPUS PEMERIKSAAN
-// =========================
+// =====================================================
 app.delete('/api/pemeriksaan/:id', async (req, res) => {
   try {
     const { id } = req.params
@@ -521,17 +555,19 @@ app.delete('/api/pemeriksaan/:id', async (req, res) => {
 
     res.status(500).json({
       berhasil: false,
-      pesan: 'Gagal menghapus pemeriksaan.',
+      pesan: 'Gagal menghapus data pemeriksaan.',
       error: error.message
     })
   }
 })
 
-// =========================
+// =====================================================
 // JALANKAN SERVER
-// =========================
+// =====================================================
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
-  console.log(`Backend PosyanduCare berjalan di http://localhost:${PORT}`)
+  console.log(
+    `Backend PosyanduCare berjalan di http://localhost:${PORT}`
+  )
 })

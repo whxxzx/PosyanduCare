@@ -6,12 +6,12 @@
     <aside class="sidebar">
 
       <div class="sidebar-logo">
-        🏥
+        🎒
         <span>PosyanduCare</span>
       </div>
 
       <div class="posyandu-name">
-        Posyandu Melati
+        Posyandu Sedap Malam 2
       </div>
 
       <nav>
@@ -20,12 +20,19 @@
           🏠 Dashboard
         </router-link>
 
-        <router-link to="/balita">
-          👶 Data Balita
+        <router-link to="/bayi">
+          👶 Bayi
         </router-link>
 
-        <router-link to="/ibu-hamil">
-          🤰 Ibu Hamil
+        <router-link
+          to="/balita"
+          class="active"
+        >
+          🧒 Balita
+        </router-link>
+
+        <router-link to="/pra-sekolah">
+          🎒 Pra Sekolah
         </router-link>
 
       </nav>
@@ -40,33 +47,149 @@
       <header class="topbar">
 
         <div>
-          <h2>Data Balita</h2>
-          <p>Data balita Posyandu Melati</p>
+
+          <h2>
+            Data Balita
+          </h2>
+
+          <p>
+            Data anak usia 12–59 bulan
+          </p>
+
+        </div>
+
+
+        <!-- PROFILE -->
+        <div
+          class="profile-wrapper"
+          @click="menuProfil = !menuProfil"
+        >
+
+          <div class="user-info">
+
+            <div class="profile-avatar">
+              👤
+            </div>
+
+            <div class="profile-name">
+
+              <strong>
+                {{ namaUser }}
+              </strong>
+
+              <small>
+                Kader Posyandu
+              </small>
+
+            </div>
+
+            <span class="profile-arrow">
+              ▾
+            </span>
+
+          </div>
+
+
+          <!-- DROPDOWN -->
+          <div
+            v-if="menuProfil"
+            class="profile-dropdown"
+            @click.stop
+          >
+
+            <div class="profile-dropdown-header">
+
+              <div class="profile-avatar large">
+                👤
+              </div>
+
+              <div>
+
+                <strong>
+                  {{ namaUser }}
+                </strong>
+
+                <small>
+                  Kader Posyandu
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <div class="profile-divider"></div>
+
+
+            <button
+              class="logout-button"
+              @click.stop="logout"
+            >
+
+              <span>
+                ↪
+              </span>
+
+              Keluar
+
+            </button>
+
+          </div>
+
         </div>
 
       </header>
 
 
       <!-- CONTENT -->
-      <section class="dashboard-content">
+      <section class="page-content">
 
-        <!-- HEADER -->
+        <!-- PAGE HEADER -->
         <div class="page-header">
 
           <div>
-            <h1>Data Balita</h1>
+
+            <h1>
+              Data Balita
+            </h1>
 
             <p>
-              Cari dan lihat informasi balita.
+              Menampilkan anak dengan usia
+              12–59 bulan secara otomatis.
             </p>
+
           </div>
 
+
           <button
-            class="primary-button"
+            class="btn-primary"
             @click="bukaFormTambah"
           >
-            + Tambah Balita
+            + Tambah Data Anak
           </button>
+
+        </div>
+
+
+        <!-- INFO KATEGORI -->
+        <div class="category-info">
+
+          <div class="category-icon">
+            🧒
+          </div>
+
+          <div>
+
+            <strong>
+              Kategori Balita
+            </strong>
+
+            <p>
+              Anak berusia 12–59 bulan akan otomatis
+              masuk ke halaman ini berdasarkan tanggal lahir.
+            </p>
+
+          </div>
 
         </div>
 
@@ -74,7 +197,9 @@
         <!-- SEARCH -->
         <div class="search-box">
 
-          <span>🔍</span>
+          <span>
+            🔍
+          </span>
 
           <input
             v-model="search"
@@ -85,179 +210,254 @@
         </div>
 
 
-        <!-- JUMLAH HASIL -->
+        <!-- JUMLAH DATA -->
         <p class="result-info">
 
-          Menampilkan {{ filteredBalita.length }}
-          dari {{ balita.length }} balita
+          Total
+          <strong>
+            {{ filteredBalita.length }}
+          </strong>
+          balita
 
         </p>
 
 
-        <!-- TABLE -->
-        <div class="table-container">
+        <!-- DATA TABLE -->
+        <div
+          v-if="filteredBalita.length > 0"
+          class="data-card"
+        >
 
-          <table>
+          <div class="table-header">
 
-            <thead>
+            <div>
 
-              <tr>
+              <h3>
+                Daftar Balita
+              </h3>
 
-                <th>
-                  No
-                </th>
+              <p>
+                Menampilkan balita usia 12–59 bulan
+              </p>
 
-                <th>
-                  Nama Balita
-                </th>
+            </div>
 
-                <th>
-                  Jenis Kelamin
-                </th>
-
-                <th>
-                  Umur
-                </th>
-
-                <th>
-                  Kunjungan Terakhir
-                </th>
-
-                <th>
-                  Aksi
-                </th>
-
-              </tr>
-
-            </thead>
+          </div>
 
 
-            <tbody>
+          <div class="table-wrapper">
 
-              <tr
-                v-for="(anak, index) in filteredBalita"
-                :key="anak.id"
-              >
+            <table>
 
-                <!-- NOMOR -->
-                <td>
-                  {{ index + 1 }}
-                </td>
+              <thead>
 
+                <tr>
 
-                <!-- NAMA BALITA + STATUS -->
-                <td>
+                  <th>
+                    No
+                  </th>
 
-                  <div class="child-name">
+                  <th>
+                    Nama Anak
+                  </th>
 
-                    <div class="child-avatar">
-                      👶
-                    </div>
+                  <th>
+                    Jenis Kelamin
+                  </th>
 
+                  <th>
+                    Tanggal Lahir
+                  </th>
 
-                    <div class="child-info">
+                  <th>
+                    Umur
+                  </th>
 
-                      <strong class="child-name-text">
-                        {{ anak.nama }}
-                      </strong>
+                  <th>
+                    Nama Ibu
+                  </th>
 
+                  <th>
+                    Alamat
+                  </th>
 
-                      <span
-                        :class="
-                          statusBalita(anak) === 'Normal'
-                            ? 'status-normal'
-                            : 'status-pending'
-                        "
-                      >
-                        {{ statusBalita(anak) }}
-                      </span>
+                  <th>
+                    Kunjungan Terakhir
+                  </th>
 
-                    </div>
+                  <th>
+                    Aksi
+                  </th>
 
-                  </div>
+                </tr>
 
-                </td>
-
-
-                <!-- JENIS KELAMIN -->
-                <td>
-
-                  {{
-                    anak.jenisKelamin === 'L'
-                      ? 'Laki-laki'
-                      : 'Perempuan'
-                  }}
-
-                </td>
+              </thead>
 
 
-                <!-- UMUR -->
-                <td>
+              <tbody>
 
-                  {{ hitungUmur(anak.tanggalLahir) }}
-
-                </td>
-
-
-                <!-- KUNJUNGAN TERAKHIR -->
-                <td>
-
-                  {{ kunjunganTerakhir(anak) }}
-
-                </td>
-
-
-                <!-- AKSI -->
-                <td>
-
-                  <button
-                    class="action-button"
-                    @click="lihatDetail(anak.id)"
-                  >
-                    Lihat
-                  </button>
-
-                  <button
-                    class="action-button"
-                    @click="bukaFormEdit(anak)"
-                  >
-                    Edit
-                  </button>
-
-                </td>
-
-              </tr>
-
-
-              <!-- JIKA DATA TIDAK DITEMUKAN -->
-              <tr
-                v-if="filteredBalita.length === 0"
-              >
-
-                <td
-                  colspan="6"
-                  class="empty-data"
+                <tr
+                  v-for="(
+                    anak,
+                    index
+                  ) in filteredBalita"
+                  :key="anak.id"
                 >
 
-                  <div>
-                    🔍
-                  </div>
+                  <!-- NO -->
+                  <td>
+                    {{ index + 1 }}
+                  </td>
 
-                  <strong>
-                    Data balita tidak ditemukan
-                  </strong>
 
-                  <p>
-                    Coba gunakan nama balita yang lain.
-                  </p>
+                  <!-- NAMA -->
+                  <td>
 
-                </td>
+                    <strong>
+                      {{ anak.nama }}
+                    </strong>
 
-              </tr>
+                  </td>
 
-            </tbody>
 
-          </table>
+                  <!-- JENIS KELAMIN -->
+                  <td>
+
+                    <span
+                      class="gender-badge"
+                      :class="
+                        anak.jenisKelamin === 'L'
+                          ? 'male'
+                          : 'female'
+                      "
+                    >
+
+                      {{
+                        anak.jenisKelamin === 'L'
+                          ? 'Laki-laki'
+                          : 'Perempuan'
+                      }}
+
+                    </span>
+
+                  </td>
+
+
+                  <!-- TANGGAL LAHIR -->
+                  <td>
+
+                    {{ formatTanggal(
+                      anak.tanggalLahir
+                    ) }}
+
+                  </td>
+
+
+                  <!-- UMUR -->
+                  <td>
+
+                    <span class="age-badge">
+
+                      {{
+                        formatUmurAnak(
+                          anak.tanggalLahir
+                        )
+                      }}
+
+                    </span>
+
+                  </td>
+
+
+                  <!-- NAMA IBU -->
+                  <td>
+
+                    {{ anak.namaIbu || '-' }}
+
+                  </td>
+
+
+                  <!-- ALAMAT -->
+                  <td>
+
+                    {{ anak.alamat || '-' }}
+
+                  </td>
+
+
+                  <!-- KUNJUNGAN -->
+                  <td>
+
+                    {{ kunjunganTerakhir(
+                      anak
+                    ) }}
+
+                  </td>
+
+
+                  <!-- AKSI -->
+                  <td>
+
+                    <div class="action-buttons">
+
+                      <button
+                        class="btn-view"
+                        @click="lihatDetail(
+                          anak.id
+                        )"
+                      >
+                        Lihat
+                      </button>
+
+                      <button
+                        class="btn-edit"
+                        @click="bukaFormEdit(
+                          anak
+                        )"
+                      >
+                        Edit
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+
+        <!-- EMPTY STATE -->
+        <div
+          v-else
+          class="empty-state"
+        >
+
+          <div class="empty-icon">
+            🧒
+          </div>
+
+          <h3>
+            Belum ada data balita
+          </h3>
+
+          <p>
+            Belum terdapat anak dengan usia
+            12–59 bulan pada data Posyandu.
+          </p>
+
+          <button
+            class="btn-primary"
+            @click="bukaFormTambah"
+          >
+            + Tambah Data Anak
+          </button>
 
         </div>
 
@@ -266,7 +466,7 @@
     </main>
 
 
-    <!-- MODAL TAMBAH BALITA -->
+    <!-- MODAL -->
     <div
       v-if="showModal"
       class="modal-overlay"
@@ -280,19 +480,23 @@
           <div>
 
             <h2>
+
               {{
                 modeForm === 'tambah'
-                  ? 'Tambah Balita'
-                  : 'Edit Balita'
+                  ? 'Tambah Data Anak'
+                  : 'Edit Data Anak'
               }}
+
             </h2>
 
             <p>
+
               {{
                 modeForm === 'tambah'
-                  ? 'Masukkan data balita baru.'
-                  : 'Ubah data balita.'
+                  ? 'Masukkan data anak baru.'
+                  : 'Ubah informasi data anak.'
               }}
+
             </p>
 
           </div>
@@ -316,13 +520,13 @@
           <div class="form-group">
 
             <label>
-              Nama Balita
+              Nama Anak
             </label>
 
             <input
               v-model="form.nama"
               type="text"
-              placeholder="Masukkan nama balita"
+              placeholder="Masukkan nama anak"
             />
 
           </div>
@@ -415,26 +619,25 @@
           </div>
 
 
-          <!-- BUTTON -->
+          <!-- ACTION -->
           <div class="modal-actions">
 
             <button
               type="button"
-              class="secondary-button"
+              class="btn-cancel"
               @click="tutupForm"
             >
               Batal
             </button>
 
-
             <button
               type="submit"
-              class="primary-button"
+              class="btn-primary"
             >
 
               {{
                 modeForm === 'tambah'
-                  ? 'Simpan Balita'
+                  ? 'Simpan Data'
                   : 'Simpan Perubahan'
               }}
 
@@ -456,225 +659,310 @@
 <script setup>
 
 import {
-  ref,
   computed,
+  onMounted,
   reactive,
-  onMounted
+  ref
 } from 'vue'
 
 import {
   useRouter
 } from 'vue-router'
 
-
-const router = useRouter()
-
-
-/*
-|--------------------------------------------------------------------------
-| DATA
-|--------------------------------------------------------------------------
-*/
-
-const balita = ref([])
-
-const search = ref('')
-
-const showModal = ref(false)
-
-const errorForm = ref('')
-
-const modeForm = ref('tambah')
-
-const editId = ref(null)
-
-const loading = ref(false)
+import {
+  tentukanKategoriAnak,
+  formatUmurAnak
+} from '../utils/kategoriAnak'
 
 
-/*
-|--------------------------------------------------------------------------
-| FORM TAMBAH / EDIT BALITA
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   ROUTER
+========================================================= */
 
-const form = reactive({
-
-  nama: '',
-
-  jenisKelamin: '',
-
-  tanggalLahir: '',
-
-  namaIbu: '',
-
-  alamat: ''
-
-})
+const router =
+  useRouter()
 
 
-/*
-|--------------------------------------------------------------------------
-| TANGGAL HARI INI
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   USER
+========================================================= */
+
+const user =
+  JSON.parse(
+    localStorage.getItem(
+      'userLogin'
+    )
+  )
+
+
+const menuProfil =
+  ref(false)
+
+
+const namaUser =
+  computed(() => {
+
+    return user?.nama || 'Kader'
+
+  })
+
+
+/* =========================================================
+   DATA
+========================================================= */
+
+const balita =
+  ref([])
+
+
+const search =
+  ref('')
+
+
+const showModal =
+  ref(false)
+
+
+const errorForm =
+  ref('')
+
+
+const modeForm =
+  ref('tambah')
+
+
+const editId =
+  ref(null)
+
+
+const sedangMemuat =
+  ref(false)
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+const form =
+  reactive({
+
+    nama: '',
+
+    jenisKelamin: '',
+
+    tanggalLahir: '',
+
+    namaIbu: '',
+
+    alamat: ''
+
+  })
+
+
+/* =========================================================
+   TANGGAL HARI INI
+========================================================= */
 
 const tanggalHariIni =
   computed(() => {
 
-    const tanggal =
+    const sekarang =
       new Date()
 
     const tahun =
-      tanggal.getFullYear()
+      sekarang.getFullYear()
 
     const bulan =
       String(
-        tanggal.getMonth() + 1
-      ).padStart(2, '0')
+        sekarang.getMonth() + 1
+      ).padStart(
+        2,
+        '0'
+      )
 
     const hari =
       String(
-        tanggal.getDate()
-      ).padStart(2, '0')
+        sekarang.getDate()
+      ).padStart(
+        2,
+        '0'
+      )
 
     return `${tahun}-${bulan}-${hari}`
 
   })
 
 
-/*
-|--------------------------------------------------------------------------
-| AMBIL DATA BALITA DARI MYSQL
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   AMBIL DATA BALITA
+========================================================= */
 
 const ambilDataBalita =
   async () => {
 
     try {
 
-      loading.value = true
+      sedangMemuat.value =
+        true
+
 
       const response =
         await fetch(
-          'http://localhost:3000/api/balita'
+          'http://localhost:3000/api/anak'
         )
 
-      const hasil =
-        await response.json()
 
-      if (!response.ok || !hasil.berhasil) {
+      if (!response.ok) {
 
         throw new Error(
-          hasil.pesan ||
           'Gagal mengambil data balita.'
         )
 
       }
 
-      const dataBalita =
-        hasil.data.map((anak) => ({
 
-          id:
-            anak.id,
+      const hasil =
+        await response.json()
 
-          nama:
-            anak.nama,
 
-          jenisKelamin:
-            anak.jenis_kelamin,
-
-          tanggalLahir:
-            anak.tanggal_lahir
-              ? anak.tanggal_lahir
-                  .substring(0, 10)
-              : '',
-
-          namaIbu:
-            anak.nama_ibu || '',
-
-          alamat:
-            anak.alamat || '',
-
-          bbLahir:
-            anak.bb_lahir,
-
-          pbLahir:
-            anak.pb_lahir,
-
-          pemeriksaan:
-            []
-
-        }))
+      const data =
+        Array.isArray(
+          hasil.data
+        )
+          ? hasil.data
+          : []
 
 
       /*
-      |--------------------------------------------------------------------------
-      | AMBIL PEMERIKSAAN SETIAP BALITA
-      |--------------------------------------------------------------------------
-      */
+       * Normalisasi data
+       */
+
+      const dataBalita =
+        data.map(
+          anak => ({
+
+            id:
+              anak.id,
+
+            nama:
+              anak.nama,
+
+            jenisKelamin:
+              anak.jenis_kelamin,
+
+            tanggalLahir:
+              anak.tanggal_lahir
+                ? String(
+                    anak.tanggal_lahir
+                  ).substring(
+                    0,
+                    10
+                  )
+                : '',
+
+            namaIbu:
+              anak.nama_ibu || '',
+
+            alamat:
+              anak.alamat || '',
+
+            pemeriksaan:
+              []
+
+          })
+        )
+
+
+      /*
+       * Ambil pemeriksaan masing-masing anak
+       */
 
       const dataLengkap =
         await Promise.all(
 
           dataBalita.map(
-            async (anak) => {
+            async anak => {
 
               try {
 
                 const responsePemeriksaan =
                   await fetch(
-                    `http://localhost:3000/api/balita/${anak.id}/pemeriksaan`
+                    `http://localhost:3000/api/anak/${anak.id}/pemeriksaan`
                   )
+
+
+                if (
+                  !responsePemeriksaan.ok
+                ) {
+
+                  return anak
+
+                }
+
 
                 const hasilPemeriksaan =
                   await responsePemeriksaan.json()
 
-                if (
-                  responsePemeriksaan.ok &&
-                  hasilPemeriksaan.berhasil
-                ) {
 
-                  anak.pemeriksaan =
-                    hasilPemeriksaan.data.map(
-                      (item) => ({
+                const dataPemeriksaan =
+                  Array.isArray(
+                    hasilPemeriksaan.data
+                  )
+                    ? hasilPemeriksaan.data
+                    : []
 
-                        id:
-                          item.id,
 
-                        tanggal:
-                          item.tanggal_pemeriksaan
-                            ? item.tanggal_pemeriksaan
-                                .substring(0, 10)
-                            : '',
+                anak.pemeriksaan =
+                  dataPemeriksaan.map(
+                    item => ({
 
-                        bb:
-                          item.bb,
+                      id:
+                        item.id,
 
-                        tb:
-                          item.tb,
+                      tanggal:
+                        item.tanggal_pemeriksaan
+                          ? String(
+                              item.tanggal_pemeriksaan
+                            ).substring(
+                              0,
+                              10
+                            )
+                          : '',
 
-                        lila:
-                          item.lila,
+                      bb:
+                        item.bb,
 
-                        lk:
-                          item.lk
+                      tb:
+                        item.tb,
 
-                      })
-                    )
+                      lk:
+                        item.lk,
 
-                }
+                      lila:
+                        item.lila,
 
-              } catch (error) {
+                      imunisasi:
+                        item.imunisasi,
+
+                      vitamin_a:
+                        item.vitamin_a,
+
+                      obat_cacing:
+                        item.obat_cacing
+
+                    })
+                  )
+
+              }
+              catch (error) {
 
                 console.error(
-                  `Gagal mengambil pemeriksaan balita ${anak.id}:`,
+                  `Gagal mengambil pemeriksaan anak ${anak.id}:`,
                   error
                 )
 
-                anak.pemeriksaan = []
-
               }
+
 
               return anak
 
@@ -684,46 +972,50 @@ const ambilDataBalita =
         )
 
 
-      balita.value =
-        dataLengkap
+      /*
+       * FILTER KHUSUS BALITA
+       *
+       * 0–11  = Bayi
+       * 12–59 = Balita
+       * 60–72 = Pra Sekolah
+       */
 
-    } catch (error) {
+      balita.value =
+        dataLengkap.filter(
+          anak =>
+            tentukanKategoriAnak(
+              anak.tanggalLahir
+            ) === 'Balita'
+        )
+
+    }
+    catch (error) {
 
       console.error(
-        'Gagal mengambil data balita:',
+        'Gagal mengambil data:',
         error
       )
 
+      balita.value =
+        []
+
       errorForm.value =
-        'Data balita gagal dimuat. Pastikan backend dan MySQL sedang berjalan.'
+        'Data balita gagal dimuat.'
 
-    } finally {
+    }
+    finally {
 
-      loading.value = false
+      sedangMemuat.value =
+        false
 
     }
 
   }
 
 
-/*
-|--------------------------------------------------------------------------
-| LOAD DATA SAAT HALAMAN DIBUKA
-|--------------------------------------------------------------------------
-*/
-
-onMounted(() => {
-
-  ambilDataBalita()
-
-})
-
-
-/*
-|--------------------------------------------------------------------------
-| SEARCH BALITA
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   SEARCH
+========================================================= */
 
 const filteredBalita =
   computed(() => {
@@ -742,107 +1034,23 @@ const filteredBalita =
 
 
     return balita.value.filter(
-      (anak) =>
-
+      anak =>
         anak.nama
           .toLowerCase()
-          .includes(keyword)
-
+          .includes(
+            keyword
+          )
     )
 
   })
 
 
-/*
-|--------------------------------------------------------------------------
-| HITUNG UMUR
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   FORMAT TANGGAL
+========================================================= */
 
-const hitungUmur =
-  (tanggalLahir) => {
-
-    if (!tanggalLahir) {
-
-      return '-'
-
-    }
-
-
-    const lahir =
-      new Date(tanggalLahir)
-
-    const sekarang =
-      new Date()
-
-
-    let tahun =
-      sekarang.getFullYear() -
-      lahir.getFullYear()
-
-
-    let bulan =
-      sekarang.getMonth() -
-      lahir.getMonth()
-
-
-    if (
-      bulan < 0 ||
-      (
-        bulan === 0 &&
-        sekarang.getDate() <
-        lahir.getDate()
-      )
-    ) {
-
-      tahun--
-
-      bulan += 12
-
-    }
-
-
-    if (tahun > 0) {
-
-      return `${tahun} tahun`
-
-    }
-
-
-    return `${bulan} bulan`
-
-  }
-
-
-/*
-|--------------------------------------------------------------------------
-| KUNJUNGAN TERAKHIR
-|--------------------------------------------------------------------------
-*/
-
-const kunjunganTerakhir =
-  (anak) => {
-
-    if (
-      !anak.pemeriksaan ||
-      anak.pemeriksaan.length === 0
-    ) {
-
-      return '-'
-
-    }
-
-
-    const tanggal =
-      anak.pemeriksaan
-        .map(
-          item =>
-            new Date(item.tanggal)
-        )
-        .sort(
-          (a, b) => b - a
-        )[0]
-
+const formatTanggal =
+  tanggal => {
 
     if (!tanggal) {
 
@@ -851,62 +1059,92 @@ const kunjunganTerakhir =
     }
 
 
-    return tanggal.toLocaleDateString(
-      'id-ID',
-      {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-      }
-    )
+    const tanggalString =
+      String(tanggal)
+        .substring(
+          0,
+          10
+        )
+
+
+    const [
+      tahun,
+      bulan,
+      hari
+    ] =
+      tanggalString.split('-')
+
+
+    if (
+      !tahun ||
+      !bulan ||
+      !hari
+    ) {
+
+      return '-'
+
+    }
+
+
+    return `${hari}-${bulan}-${tahun}`
 
   }
 
 
-/*
-|--------------------------------------------------------------------------
-| STATUS PERTUMBUHAN BALITA
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   KUNJUNGAN TERAKHIR
+========================================================= */
 
-const statusBalita =
-  (anak) => {
+const kunjunganTerakhir =
+  anak => {
 
     if (
       !anak.pemeriksaan ||
       anak.pemeriksaan.length === 0
     ) {
 
-      return 'Belum diperiksa'
+      return '-'
 
     }
 
 
-    const pemeriksaanTerbaru =
+    const tanggalTerakhir =
       [...anak.pemeriksaan]
+        .filter(
+          item =>
+            item.tanggal
+        )
         .sort(
           (a, b) =>
-            new Date(b.tanggal) -
-            new Date(a.tanggal)
+            new Date(
+              b.tanggal
+            ) -
+            new Date(
+              a.tanggal
+            )
         )[0]
 
 
-    return (
-      pemeriksaanTerbaru.status ||
-      'Belum dihitung'
+    if (!tanggalTerakhir) {
+
+      return '-'
+
+    }
+
+
+    return formatTanggal(
+      tanggalTerakhir.tanggal
     )
 
   }
 
 
-/*
-|--------------------------------------------------------------------------
-| DETAIL BALITA
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   DETAIL
+========================================================= */
 
 const lihatDetail =
-  (id) => {
+  id => {
 
     router.push(
       `/balita/${id}`
@@ -915,54 +1153,51 @@ const lihatDetail =
   }
 
 
-/*
-|--------------------------------------------------------------------------
-| BUKA FORM TAMBAH
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   TAMBAH
+========================================================= */
 
-const bukaFormTambah = () => {
+const bukaFormTambah =
+  () => {
 
-  modeForm.value =
-    'tambah'
+    modeForm.value =
+      'tambah'
 
-  editId.value =
-    null
+    editId.value =
+      null
 
-  errorForm.value =
-    ''
-
-
-  form.nama =
-    ''
-
-  form.jenisKelamin =
-    ''
-
-  form.tanggalLahir =
-    ''
-
-  form.namaIbu =
-    ''
-
-  form.alamat =
-    ''
+    errorForm.value =
+      ''
 
 
-  showModal.value =
-    true
+    form.nama =
+      ''
 
-}
+    form.jenisKelamin =
+      ''
+
+    form.tanggalLahir =
+      ''
+
+    form.namaIbu =
+      ''
+
+    form.alamat =
+      ''
 
 
-/*
-|--------------------------------------------------------------------------
-| BUKA FORM EDIT
-|--------------------------------------------------------------------------
-*/
+    showModal.value =
+      true
+
+  }
+
+
+/* =========================================================
+   EDIT
+========================================================= */
 
 const bukaFormEdit =
-  (anak) => {
+  anak => {
 
     modeForm.value =
       'edit'
@@ -987,7 +1222,7 @@ const bukaFormEdit =
       anak.namaIbu || ''
 
     form.alamat =
-      anak.alamat
+      anak.alamat || ''
 
 
     showModal.value =
@@ -996,28 +1231,25 @@ const bukaFormEdit =
   }
 
 
-/*
-|--------------------------------------------------------------------------
-| TUTUP FORM
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   TUTUP MODAL
+========================================================= */
 
-const tutupForm = () => {
+const tutupForm =
+  () => {
 
-  showModal.value =
-    false
+    showModal.value =
+      false
 
-  errorForm.value =
-    ''
+    errorForm.value =
+      ''
 
-}
+  }
 
 
-/*
-|--------------------------------------------------------------------------
-| SIMPAN DATA BALITA
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   SIMPAN DATA
+========================================================= */
 
 const simpanDataBalita =
   async () => {
@@ -1027,10 +1259,8 @@ const simpanDataBalita =
 
 
     /*
-    |--------------------------------------------------------------------------
-    | VALIDASI
-    |--------------------------------------------------------------------------
-    */
+     * VALIDASI
+     */
 
     if (
       !form.nama.trim() ||
@@ -1047,24 +1277,23 @@ const simpanDataBalita =
     }
 
 
-    try {
+    /*
+     * TAMBAH
+     */
 
-      /*
-      |--------------------------------------------------------------------------
-      | MODE TAMBAH
-      |--------------------------------------------------------------------------
-      */
+    if (
+      modeForm.value ===
+      'tambah'
+    ) {
 
-      if (
-        modeForm.value ===
-        'tambah'
-      ) {
+      try {
 
         const response =
           await fetch(
-            'http://localhost:3000/api/balita',
+            'http://localhost:3000/api/anak',
             {
-              method: 'POST',
+              method:
+                'POST',
 
               headers: {
                 'Content-Type':
@@ -1107,7 +1336,7 @@ const simpanDataBalita =
 
           throw new Error(
             hasil.pesan ||
-            'Gagal menambahkan data balita.'
+            'Gagal menambahkan data.'
           )
 
         }
@@ -1118,25 +1347,40 @@ const simpanDataBalita =
         await ambilDataBalita()
 
         alert(
-          'Data balita berhasil ditambahkan.'
+          'Data anak berhasil ditambahkan.'
         )
 
-        return
+      }
+      catch (error) {
+
+        console.error(
+          error
+        )
+
+        errorForm.value =
+          error.message ||
+          'Gagal menambahkan data.'
 
       }
 
 
-      /*
-      |--------------------------------------------------------------------------
-      | MODE EDIT
-      |--------------------------------------------------------------------------
-      */
+      return
+
+    }
+
+
+    /*
+     * EDIT
+     */
+
+    try {
 
       const response =
         await fetch(
-          `http://localhost:3000/api/balita/${editId.value}`,
+          `http://localhost:3000/api/anak/${editId.value}`,
           {
-            method: 'PUT',
+            method:
+              'PUT',
 
             headers: {
               'Content-Type':
@@ -1179,7 +1423,7 @@ const simpanDataBalita =
 
         throw new Error(
           hasil.pesan ||
-          'Gagal memperbarui data balita.'
+          'Gagal memperbarui data.'
         )
 
       }
@@ -1190,165 +1434,737 @@ const simpanDataBalita =
       await ambilDataBalita()
 
       alert(
-        'Data balita berhasil diperbarui.'
+        'Data anak berhasil diperbarui.'
       )
 
-    } catch (error) {
+    }
+    catch (error) {
 
       console.error(
-        'Simpan Balita Error:',
         error
       )
 
       errorForm.value =
         error.message ||
-        'Terjadi kesalahan saat menyimpan data balita.'
+        'Gagal memperbarui data.'
 
     }
 
   }
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+const logout =
+  () => {
+
+    localStorage.removeItem(
+      'userLogin'
+    )
+
+
+    router.push(
+      '/login'
+    )
+
+  }
+
+
+/* =========================================================
+   LOAD
+========================================================= */
+
+onMounted(
+  () => {
+
+    ambilDataBalita()
+
+  }
+)
 
 </script>
 
 
 <style scoped>
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.page-content {
+  padding: 30px;
+}
+
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+
+.page-header h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+
+.page-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.profile-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.profile-avatar {
+  width: 38px;
+  height: 38px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 20px;
+
+  border-radius: 50%;
+  font-size: 18px;
 }
+
+
+.profile-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+
+.profile-name strong {
+  font-size: 14px;
+}
+
+
+.profile-name small {
+  font-size: 11px;
+}
+
+
+.profile-arrow {
+  margin-left: 3px;
+}
+
+
+.profile-dropdown {
+  position: absolute;
+
+  top: calc(100% + 10px);
+  right: 0;
+
+  width: 220px;
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.1);
+
+  z-index: 2000;
+}
+
+
+.profile-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.profile-avatar.large {
+  width: 42px;
+  height: 42px;
+}
+
+
+.profile-dropdown-header > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+
+.profile-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 10px 0;
+}
+
+
+.logout-button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+
+  cursor: pointer;
+  text-align: left;
+}
+
+
+.logout-button:hover {
+  background: #fef2f2;
+}
+
+
+/* =========================================================
+   INFO KATEGORI
+========================================================= */
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 18px 20px;
+  margin-bottom: 20px;
+
+  background: #eff6ff;
+
+  border: 1px solid #bfdbfe;
+
+  border-radius: 12px;
+}
+
+
+.category-icon {
+  width: 45px;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #dbeafe;
+
+  font-size: 22px;
+}
+
+
+.category-info strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+
+.category-info p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  max-width: 450px;
+
+  margin-bottom: 10px;
+
+  padding: 10px 14px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 9px;
+
+  box-sizing: border-box;
+}
+
+
+.search-box span {
+  font-size: 16px;
+}
+
+
+.search-box input {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  font-size: 14px;
+
+  background: transparent;
+}
+
+
+.result-info {
+  margin: 0 0 12px;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.btn-primary {
+  padding: 11px 18px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #2563eb;
+
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+
+/* =========================================================
+   DATA CARD
+========================================================= */
+
+.data-card {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+}
+
+
+.table-header {
+  padding: 20px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+.table-header h3 {
+  margin: 0 0 5px;
+}
+
+
+.table-header p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+
+th,
+td {
+  padding: 14px 16px;
+
+  text-align: left;
+
+  border-bottom: 1px solid #f1f5f9;
+
+  font-size: 13px;
+}
+
+
+th {
+  background: #f8fafc;
+
+  color: #475569;
+
+  font-weight: 600;
+}
+
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+
+/* =========================================================
+   BADGE
+========================================================= */
+
+.gender-badge,
+.age-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  padding: 5px 9px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+
+.gender-badge.male {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+
+.gender-badge.female {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+
+.age-badge {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.btn-view,
+.btn-edit {
+  padding: 7px 11px;
+
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+
+.btn-view {
+  border: 1px solid #bfdbfe;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+}
+
+
+.btn-edit {
+  border: 1px solid #fed7aa;
+
+  background: #fff7ed;
+
+  color: #ea580c;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-state {
+  min-height: 300px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  text-align: center;
+}
+
+
+.empty-icon {
+  font-size: 40px;
+}
+
+
+.empty-state h3 {
+  margin: 5px 0;
+}
+
+
+.empty-state p {
+  margin: 0 0 10px;
+
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(
+    0,
+    0,
+    0,
+    0.45
+  );
+
+  z-index: 1000;
+}
+
 
 .modal-box {
   width: 100%;
   max-width: 520px;
+
   max-height: 90vh;
+
   overflow-y: auto;
-  background: white;
-  border-radius: 14px;
+
   padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+
+  box-sizing: border-box;
+
+  background: white;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 20px 50px
+    rgba(
+      0,
+      0,
+      0,
+      0.2
+    );
 }
+
 
 .modal-header {
   display: flex;
+
   justify-content: space-between;
+
   align-items: flex-start;
+
   margin-bottom: 20px;
 }
+
 
 .modal-header h2 {
   margin: 0 0 5px;
 }
 
+
 .modal-header p {
   margin: 0;
-  color: #6b7280;
+
+  color: #64748b;
+
   font-size: 14px;
 }
 
+
 .modal-close {
   border: none;
+
   background: transparent;
+
+  color: #64748b;
+
   font-size: 20px;
+
   cursor: pointer;
-  color: #6b7280;
 }
+
 
 .form-group {
   margin-bottom: 16px;
 }
 
+
 .form-group label {
   display: block;
+
   margin-bottom: 7px;
-  font-weight: 600;
+
   font-size: 14px;
+
+  font-weight: 600;
 }
+
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
+
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 14px;
+
   box-sizing: border-box;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+
+  font-size: 14px;
 }
+
 
 .form-group textarea {
   resize: vertical;
 }
 
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #4f46e5;
+
+  border-color: #2563eb;
 }
+
 
 .form-error {
   padding: 10px 12px;
+
   margin-bottom: 16px;
+
   background: #fef2f2;
+
   color: #dc2626;
+
   border-radius: 8px;
-  font-size: 14px;
+
+  font-size: 13px;
 }
+
 
 .modal-actions {
   display: flex;
+
   justify-content: flex-end;
+
   gap: 10px;
+
   margin-top: 20px;
 }
 
-.secondary-button {
-  border: 1px solid #d1d5db;
-  background: white;
-  color: #374151;
+
+.btn-cancel {
   padding: 10px 16px;
+
+  border: 1px solid #d1d5db;
+
   border-radius: 8px;
+
+  background: white;
+
+  color: #374151;
+
   cursor: pointer;
+
   font-weight: 600;
 }
 
-.secondary-button:hover {
-  background: #f9fafb;
-}
 
-.action-button + .action-button {
-  margin-left: 8px;
-}
-
-
-/* =========================
-   NAMA BALITA + STATUS
-========================= */
-
-.child-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 7px;
-}
-
-.child-name-text {
-  line-height: 1.3;
-}
-
-.child-info .status-normal,
-.child-info .status-pending {
-  display: inline-block;
-  width: fit-content;
-  line-height: 1.2;
+.btn-cancel:hover {
+  background: #f8fafc;
 }
 
 </style>

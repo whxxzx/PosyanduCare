@@ -1,7 +1,9 @@
 <template>
+
   <div class="app-layout">
 
     <!-- SIDEBAR -->
+
     <aside class="sidebar">
 
       <div class="sidebar-logo">
@@ -14,59 +16,74 @@
       </div>
 
       <nav>
+
         <router-link to="/dashboard">
           🏠 Dashboard
         </router-link>
 
         <router-link to="/bayi">
           👶 Bayi
-        </router-link>
+        </router-link>      
 
         <router-link to="/balita">
-          🧒 Balita
+  🧒 Balita
+</router-link>
+
+<router-link to="/pra-sekolah">
+  🎒 Pra Sekolah
+</router-link>
+
+        <router-link to="/ibu-hamil">
+          🤰 Ibu Hamil
         </router-link>
 
-        <router-link to="/pra-sekolah">
-          🎒 Pra Sekolah
-        </router-link>
       </nav>
 
     </aside>
 
 
     <!-- MAIN CONTENT -->
+
     <main class="main-content">
 
       <header class="topbar">
+
         <div>
+
           <h2>
-            Detail Balita
+            Detail Bayi
           </h2>
 
           <p>
-            Informasi dan pemantauan perkembangan balita
+            Informasi dan pemantauan perkembangan bayi
           </p>
+
         </div>
+
       </header>
 
 
       <section class="dashboard-content">
 
+
         <!-- KEMBALI -->
+
         <router-link
-          to="/balita"
-          class="back-link"
-        >
-          ← Kembali ke Data Balita
-        </router-link>
+  to="/bayi"
+  class="back-link"
+>
+  ← Kembali ke Data Bayi
+</router-link>
 
 
         <!-- PROFILE -->
+
         <div class="profile-header">
 
           <div class="profile-avatar">
             👶
           </div>
+
 
           <div class="profile-main">
 
@@ -82,14 +99,19 @@
 
             </div>
 
+
             <p>
+
               {{
                 anak.jenisKelamin === 'L'
                   ? 'Laki-laki'
                   : 'Perempuan'
               }}
+
               •
+
               {{ hitungUmur(anak.tanggalLahir) }}
+
             </p>
 
           </div>
@@ -106,18 +128,23 @@
 
 
         <!-- INFORMASI -->
+
         <div class="detail-top-grid">
+
 
           <div class="dashboard-panel">
 
             <div class="panel-header">
+
               <h3>
-                Informasi Balita
+                Informasi Bayi
               </h3>
+
             </div>
 
 
             <div class="info-row">
+
               <span>
                 Nama
               </span>
@@ -125,10 +152,12 @@
               <strong>
                 {{ anak.nama }}
               </strong>
+
             </div>
 
 
             <div class="info-row">
+
               <span>
                 Tanggal Lahir
               </span>
@@ -136,44 +165,42 @@
               <strong>
                 {{ formatTanggal(anak.tanggalLahir) }}
               </strong>
-            </div>
 
+            </div>
 
             <div class="info-row">
 
-              <span>
-                BB Lahir
-              </span>
+  <span>
+    BB Lahir
+  </span>
 
-              <strong>
-                {{
-                  anak.bbLahir !== null &&
-                  anak.bbLahir !== undefined
-                    ? `${anak.bbLahir} kg`
-                    : '-'
-                }}
-              </strong>
+  <strong>
+    {{
+      anak.bbLahir !== null &&
+      anak.bbLahir !== undefined
+        ? `${anak.bbLahir} kg`
+        : '-'
+    }}
+  </strong>
 
-            </div>
+</div>
 
+<div class="info-row">
 
-            <div class="info-row">
+  <span>
+    PB Lahir
+  </span>
 
-              <span>
-                PB Lahir
-              </span>
+  <strong>
+    {{
+      anak.pbLahir !== null &&
+      anak.pbLahir !== undefined
+        ? `${anak.pbLahir} cm`
+        : '-'
+    }}
+  </strong>
 
-              <strong>
-                {{
-                  anak.pbLahir !== null &&
-                  anak.pbLahir !== undefined
-                    ? `${anak.pbLahir} cm`
-                    : '-'
-                }}
-              </strong>
-
-            </div>
-
+</div>
 
             <div class="info-row">
 
@@ -182,11 +209,13 @@
               </span>
 
               <strong>
+
                 {{
                   anak.jenisKelamin === 'L'
                     ? 'Laki-laki'
                     : 'Perempuan'
                 }}
+
               </strong>
 
             </div>
@@ -221,6 +250,7 @@
 
 
           <!-- KUNJUNGAN -->
+
           <div class="dashboard-panel last-visit-card">
 
             <div class="visit-icon">
@@ -245,13 +275,206 @@
         </div>
 
 
-        <!-- =====================================================
-             TABS
-        ====================================================== -->
+        <!-- =========================
+             STATUS PERTUMBUHAN WHO
+        ========================== -->
+
+        <div class="dashboard-panel who-status-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h3>
+                Status Pertumbuhan
+              </h3>
+
+              <p class="panel-description">
+                Berdasarkan indikator TB/PB menurut umur
+              </p>
+
+            </div>
+
+            <span
+              v-if="hasilWHO?.berhasil"
+              :class="[
+                'who-status-badge',
+                hasilWHO.status === 'Normal'
+                  ? 'who-normal'
+                  : 'who-stunted'
+              ]"
+            >
+
+              {{
+                hasilWHO.status === 'Normal'
+                  ? 'Normal'
+                  : hasilWHO.status
+              }}
+
+            </span>
+
+          </div>
+
+
+          <!-- LOADING -->
+
+          <div
+            v-if="sedangMenghitung"
+            class="who-loading"
+          >
+
+            <span class="loading-spinner"></span>
+
+            Menghitung berdasarkan standar WHO...
+
+          </div>
+
+
+          <!-- HASIL -->
+
+          <div
+            v-else-if="hasilWHO?.berhasil"
+            class="who-result"
+          >
+
+
+            <div class="who-result-main">
+
+              <div class="who-status-icon">
+
+                {{
+                  hasilWHO.status === 'Normal'
+                    ? '✓'
+                    : '!'
+                }}
+
+              </div>
+
+
+              <div>
+
+                <h2>
+
+                  {{
+                    hasilWHO.status === 'Normal'
+                      ? 'Tidak Stunting'
+                      : 'Terindikasi Stunting'
+                  }}
+
+                </h2>
+
+                <p>
+                  {{ hasilWHO.keterangan }}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="who-metrics">
+
+
+              <div class="who-metric">
+
+                <span>
+                  TB/PB
+                </span>
+
+                <strong>
+                  {{ pemeriksaanTerbaru[0]?.tb }} cm
+                </strong>
+
+              </div>
+
+
+              <!-- UMUR -->
+
+              <div class="who-metric">
+
+                <span>
+                  Umur
+                </span>
+
+                <strong>
+                  {{ formatUmurWHO() }}
+                </strong>
+
+              </div>
+
+
+              <div class="who-metric">
+
+                <span>
+                  Z-score
+                </span>
+
+                <strong>
+
+                  {{
+                    hasilWHO.zScore
+                  }}
+
+                  SD
+
+                </strong>
+
+              </div>
+
+
+              <div class="who-metric">
+
+                <span>
+                  Indikator
+                </span>
+
+                <strong>
+                  TB/PB menurut umur
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <div class="who-info">
+
+              <span>
+                ℹ️
+              </span>
+
+              <p>
+
+                Hasil ini merupakan perhitungan
+                antropometri berdasarkan standar
+                pertumbuhan WHO dan bukan diagnosis
+                medis.
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- ERROR -->
+
+          <div
+            v-else
+            class="who-empty"
+          >
+
+            Belum ada hasil perhitungan.
+
+          </div>
+
+        </div>
+
+
+        <!-- TABS -->
 
         <div class="detail-tabs">
 
-          <!-- HISTORI -->
           <button
             :class="[
               'tab-button',
@@ -265,21 +488,6 @@
           </button>
 
 
-          <!-- HASIL PEMANTAUAN -->
-          <button
-            :class="[
-              'tab-button',
-              {
-                active: activeTab === 'pemantauan'
-              }
-            ]"
-            @click="activeTab = 'pemantauan'"
-          >
-            📊 Hasil Pemantauan
-          </button>
-
-
-          <!-- GRAFIK -->
           <button
             :class="[
               'tab-button',
@@ -295,9 +503,9 @@
         </div>
 
 
-        <!-- =====================================================
-             HISTORI PEMERIKSAAN
-        ====================================================== -->
+        <!-- =========================
+             HISTORI
+        ========================== -->
 
         <div
           v-if="activeTab === 'histori'"
@@ -330,6 +538,7 @@
 
 
           <!-- JARAK TABEL -->
+
           <div class="history-table-spacing">
 
             <div class="table-container">
@@ -341,15 +550,25 @@
                   <tr>
 
                     <th>No</th>
+
                     <th>Tanggal</th>
+
                     <th>TB/PB</th>
+
                     <th>BB</th>
+
                     <th>LK</th>
+
                     <th>LILA</th>
+
                     <th>Status</th>
+
                     <th>Imunisasi</th>
+
                     <th>Vitamin A</th>
+
                     <th>Obat Cacing</th>
+
                     <th>Aksi</th>
 
                   </tr>
@@ -414,6 +633,7 @@
 
 
                     <!-- IMUNISASI -->
+
                     <td>
 
                       <span
@@ -435,6 +655,7 @@
 
 
                     <!-- VITAMIN A -->
+
                     <td>
 
                       <span
@@ -456,6 +677,7 @@
 
 
                     <!-- OBAT CACING -->
+
                     <td>
 
                       <span
@@ -539,292 +761,9 @@
         </div>
 
 
-        <!-- =====================================================
-             HASIL PEMANTAUAN
-        ====================================================== -->
-
-        <div
-          v-if="activeTab === 'pemantauan'"
-          class="dashboard-panel"
-        >
-
-          <div class="panel-header">
-
-            <div>
-
-              <h3>
-                Hasil Pemantauan
-              </h3>
-
-              <p class="panel-description">
-                Hasil pengukuran berdasarkan indikator pertumbuhan WHO
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- LOADING -->
-          <div
-            v-if="sedangMenghitung"
-            class="who-loading"
-          >
-
-            <span class="loading-spinner"></span>
-
-            Menghitung berdasarkan standar WHO...
-
-          </div>
-
-
-          <!-- BELUM ADA HASIL -->
-          <div
-            v-else-if="!hasilWHO?.berhasil"
-            class="who-empty"
-          >
-
-            {{
-              hasilWHO?.pesan ||
-              'Belum ada hasil perhitungan.'
-            }}
-
-          </div>
-
-
-          <!-- HASIL PEMANTAUAN -->
-          <div
-            v-else
-            class="monitoring-result"
-          >
-
-            <!-- TB/PB MENURUT UMUR -->
-            <div class="monitoring-card">
-
-              <div class="monitoring-card-header">
-
-                <div>
-                  <span class="monitoring-icon">
-                    📏
-                  </span>
-
-                  <strong>
-                    TB/PB menurut umur
-                  </strong>
-                </div>
-
-                <span
-                  :class="
-                    hasilWHO.tbU?.status === 'Normal'
-                      ? 'status-normal'
-                      : 'status-pending'
-                  "
-                >
-                  {{ hasilWHO.tbU?.status || '-' }}
-                </span>
-
-              </div>
-
-
-              <div class="monitoring-value">
-
-                {{
-                  hasilWHO.tbU?.zScore !== null &&
-                  hasilWHO.tbU?.zScore !== undefined
-                    ? `${hasilWHO.tbU.zScore} SD`
-                    : '-'
-                }}
-
-              </div>
-
-
-              <p>
-                {{
-                  hasilWHO.tbU?.keterangan ||
-                  '-'
-                }}
-              </p>
-
-            </div>
-
-
-            <!-- BB MENURUT UMUR -->
-            <div class="monitoring-card">
-
-              <div class="monitoring-card-header">
-
-                <div>
-                  <span class="monitoring-icon">
-                    ⚖️
-                  </span>
-
-                  <strong>
-                    BB menurut umur
-                  </strong>
-                </div>
-
-                <span
-                  :class="
-                    hasilWHO.bbU?.status === 'Normal'
-                      ? 'status-normal'
-                      : 'status-pending'
-                  "
-                >
-                  {{ hasilWHO.bbU?.status || '-' }}
-                </span>
-
-              </div>
-
-
-              <div class="monitoring-value">
-
-                {{
-                  hasilWHO.bbU?.zScore !== null &&
-                  hasilWHO.bbU?.zScore !== undefined
-                    ? `${hasilWHO.bbU.zScore} SD`
-                    : '-'
-                }}
-
-              </div>
-
-
-              <p>
-                {{
-                  hasilWHO.bbU?.keterangan ||
-                  '-'
-                }}
-              </p>
-
-            </div>
-
-
-            <!-- BB MENURUT TB/PB -->
-            <div class="monitoring-card">
-
-              <div class="monitoring-card-header">
-
-                <div>
-                  <span class="monitoring-icon">
-                    ⚖️
-                  </span>
-
-                  <strong>
-                    BB menurut TB/PB
-                  </strong>
-                </div>
-
-                <span
-                  :class="
-                    hasilWHO.bbTbPb?.status === 'Normal'
-                      ? 'status-normal'
-                      : 'status-pending'
-                  "
-                >
-                  {{ hasilWHO.bbTbPb?.status || '-' }}
-                </span>
-
-              </div>
-
-
-              <div class="monitoring-value">
-
-                {{
-                  hasilWHO.bbTbPb?.zScore !== null &&
-                  hasilWHO.bbTbPb?.zScore !== undefined
-                    ? `${hasilWHO.bbTbPb.zScore} SD`
-                    : '-'
-                }}
-
-              </div>
-
-
-              <p>
-                {{
-                  hasilWHO.bbTbPb?.keterangan ||
-                  '-'
-                }}
-              </p>
-
-            </div>
-
-
-            <!-- IMT MENURUT UMUR -->
-            <div class="monitoring-card">
-
-              <div class="monitoring-card-header">
-
-                <div>
-                  <span class="monitoring-icon">
-                    📊
-                  </span>
-
-                  <strong>
-                    IMT menurut umur
-                  </strong>
-                </div>
-
-                <span
-                  :class="
-                    hasilWHO.imtU?.status === 'Normal'
-                      ? 'status-normal'
-                      : 'status-pending'
-                  "
-                >
-                  {{ hasilWHO.imtU?.status || '-' }}
-                </span>
-
-              </div>
-
-
-              <div class="monitoring-value">
-
-                {{
-                  hasilWHO.imtU?.zScore !== null &&
-                  hasilWHO.imtU?.zScore !== undefined
-                    ? `${hasilWHO.imtU.zScore} SD`
-                    : '-'
-                }}
-
-              </div>
-
-
-              <p>
-                IMT:
-                {{
-                  hasilWHO.imtU?.nilai !== null &&
-                  hasilWHO.imtU?.nilai !== undefined
-                    ? `${hasilWHO.imtU.nilai} kg/m²`
-                    : '-'
-                }}
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- INFO WHO -->
-          <div class="who-info">
-
-            <span>
-              ℹ️
-            </span>
-
-            <p>
-              Hasil ini merupakan perhitungan
-              antropometri berdasarkan standar
-              pertumbuhan WHO dan bukan diagnosis
-              medis.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <!-- =====================================================
+        <!-- =========================
              GRAFIK
-        ====================================================== -->
+        ========================== -->
 
         <div
           v-if="activeTab === 'grafik'"
@@ -832,6 +771,7 @@
         >
 
           <!-- GRAFIK TB/PB -->
+
           <div class="growth-chart-section">
 
             <h3>
@@ -847,6 +787,7 @@
 
 
           <!-- KURVA WHO -->
+
           <div class="growth-chart-section">
 
             <h3>
@@ -857,16 +798,17 @@
               TB/PB menurut umur berdasarkan standar pertumbuhan WHO
             </p>
 
-            <WHOGrowthChart
-              :pemeriksaan="anak.pemeriksaan"
-              :tanggal-lahir="anak.tanggalLahir"
-              :jenis-kelamin="anak.jenisKelamin"
-            />
+           <WHOGrowthChart
+  :pemeriksaan="anak.pemeriksaan"
+  :tanggal-lahir="anak.tanggalLahir"
+  :jenis-kelamin="anak.jenisKelamin"
+/>
 
           </div>
 
 
           <!-- GRAFIK BB -->
+
           <div class="growth-chart-section">
 
             <h3>
@@ -882,6 +824,7 @@
 
 
           <!-- GRAFIK LK -->
+
           <div class="growth-chart-section">
 
             <h3>
@@ -897,6 +840,7 @@
 
 
           <!-- GRAFIK LILA -->
+
           <div class="growth-chart-section">
 
             <h3>
@@ -912,14 +856,15 @@
 
         </div>
 
+
       </section>
 
     </main>
 
 
-    <!-- =====================================================
+    <!-- =========================
          MODAL FORM
-    ====================================================== -->
+    ========================== -->
 
     <div
       v-if="showModal"
@@ -929,7 +874,9 @@
 
       <div class="modal-card">
 
+
         <!-- MODAL HEADER -->
+
         <div class="modal-header">
 
           <div>
@@ -960,12 +907,15 @@
 
 
         <!-- FORM -->
+
         <form
           @submit.prevent="simpanPemeriksaan"
           class="form-body"
         >
 
+
           <!-- TANGGAL -->
+
           <div class="form-group">
 
             <label>
@@ -983,6 +933,7 @@
 
 
           <!-- TB -->
+
           <div class="form-group">
 
             <label>
@@ -1004,6 +955,7 @@
 
 
           <!-- BB -->
+
           <div class="form-group">
 
             <label>
@@ -1025,6 +977,7 @@
 
 
           <!-- LK -->
+
           <div class="form-group">
 
             <label>
@@ -1046,6 +999,7 @@
 
 
           <!-- LILA -->
+
           <div class="form-group">
 
             <label>
@@ -1066,13 +1020,17 @@
           </div>
 
 
-          <!-- IMUNISASI -->
+          <!-- =========================
+               IMUNISASI
+          ========================== -->
+
           <div class="form-group">
 
             <label>
               Apakah imunisasi diberikan?
               <span>*</span>
             </label>
+
 
             <div class="yes-no-choice">
 
@@ -1122,13 +1080,17 @@
           </div>
 
 
-          <!-- VITAMIN A -->
+          <!-- =========================
+               VITAMIN A
+          ========================== -->
+
           <div class="form-group">
 
             <label>
               Apakah Vitamin A diberikan?
               <span>*</span>
             </label>
+
 
             <div class="yes-no-choice">
 
@@ -1178,13 +1140,17 @@
           </div>
 
 
-          <!-- OBAT CACING -->
+          <!-- =========================
+               OBAT CACING
+          ========================== -->
+
           <div class="form-group">
 
             <label>
               Apakah obat cacing diberikan?
               <span>*</span>
             </label>
+
 
             <div class="yes-no-choice">
 
@@ -1235,6 +1201,7 @@
 
 
           <!-- INFO -->
+
           <div class="form-info">
 
             <span>
@@ -1250,6 +1217,7 @@
 
 
           <!-- BUTTON -->
+
           <div class="form-actions">
 
             <button
@@ -1281,6 +1249,7 @@
     </div>
 
   </div>
+
 </template>
 
 
@@ -1316,11 +1285,9 @@ import {
 
 const route = useRoute()
 
-const id =
-  Number(route.params.id)
+const id = Number(route.params.id)
 
-const API_URL =
-  'http://localhost:3000/api'
+const API_URL = 'http://localhost:3000/api'
 
 
 /*
@@ -1345,15 +1312,14 @@ const anak = reactive({
 
   bbLahir: null,
 
-  pbLahir: null,
+pbLahir: null,
 
   pemeriksaan: []
 
 })
 
 
-const loadingData =
-  ref(true)
+const loadingData = ref(true)
 
 
 /*
@@ -1362,8 +1328,7 @@ const loadingData =
 |--------------------------------------------------------------------------
 */
 
-const activeTab =
-  ref('histori')
+const activeTab = ref('histori')
 
 
 /*
@@ -1372,11 +1337,9 @@ const activeTab =
 |--------------------------------------------------------------------------
 */
 
-const hasilWHO =
-  ref(null)
+const hasilWHO = ref(null)
 
-const sedangMenghitung =
-  ref(false)
+const sedangMenghitung = ref(false)
 
 
 /*
@@ -1385,11 +1348,9 @@ const sedangMenghitung =
 |--------------------------------------------------------------------------
 */
 
-const showModal =
-  ref(false)
+const showModal = ref(false)
 
-const mode =
-  ref('tambah')
+const mode = ref('tambah')
 
 
 /*
@@ -1398,79 +1359,78 @@ const mode =
 |--------------------------------------------------------------------------
 */
 
-const form =
-  ref({
+const form = ref({
 
-    id: null,
+  id: null,
 
-    tanggal: '',
+  tanggal: '',
 
-    tb: '',
+  tb: '',
 
-    bb: '',
+  bb: '',
 
-    lk: '',
+  lk: '',
 
-    lila: '',
+  lila: '',
 
-    imunisasi: false,
+  imunisasi: false,
 
-    vitaminA: false,
+  vitaminA: false,
 
-    obatCacing: false
+  obatCacing: false
 
-  })
+})
 
 
 /*
 |--------------------------------------------------------------------------
 | NORMALISASI TANGGAL
 |--------------------------------------------------------------------------
+|
+| MySQL DATE dari backend dapat dikirim browser sebagai:
+| 2026-09-15
+| atau
+| 2026-09-14T17:00:00.000Z
+|
+| Fungsi ini memastikan tanggal tetap menjadi tanggal lokal Indonesia.
+|--------------------------------------------------------------------------
 */
 
-const normalisasiTanggal =
-  (tanggal) => {
+const normalisasiTanggal = (tanggal) => {
 
-    if (!tanggal) {
-      return ''
-    }
+  if (!tanggal) {
+    return ''
+  }
 
-    if (
-      typeof tanggal === 'string' &&
-      /^\d{4}-\d{2}-\d{2}$/.test(tanggal)
-    ) {
+  if (
+    typeof tanggal === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(tanggal)
+  ) {
 
-      return tanggal
-
-    }
-
-    const date =
-      new Date(tanggal)
-
-    if (
-      isNaN(date.getTime())
-    ) {
-
-      return ''
-
-    }
-
-    const tahun =
-      date.getFullYear()
-
-    const bulan =
-      String(
-        date.getMonth() + 1
-      ).padStart(2, '0')
-
-    const hari =
-      String(
-        date.getDate()
-      ).padStart(2, '0')
-
-    return `${tahun}-${bulan}-${hari}`
+    return tanggal
 
   }
+
+  const date = new Date(tanggal)
+
+  if (isNaN(date.getTime())) {
+    return ''
+  }
+
+  const tahun =
+    date.getFullYear()
+
+  const bulan =
+    String(date.getMonth() + 1)
+      .padStart(2, '0')
+
+  const hari =
+    String(date.getDate())
+      .padStart(2, '0')
+
+  return `${tahun}-${bulan}-${hari}`
+
+}
 
 
 /*
@@ -1479,104 +1439,117 @@ const normalisasiTanggal =
 |--------------------------------------------------------------------------
 */
 
-const loadBalita =
-  async () => {
+const loadBalita = async () => {
 
-    try {
+  try {
 
-      loadingData.value =
-        true
+    loadingData.value = true
 
 
-      const responseBalita =
-        await fetch(
-          `${API_URL}/anak/${id}`
-        )
+    /*
+    |--------------------------------------------------------------------------
+    | AMBIL DATA BALITA
+    |--------------------------------------------------------------------------
+    */
 
-
-      if (!responseBalita.ok) {
-
-        throw new Error(
-          'Data balita tidak ditemukan.'
-        )
-
-      }
-
-
-      const hasilBalita =
-        await responseBalita.json()
-
-
-      if (
-        !hasilBalita.berhasil ||
-        !hasilBalita.data
-      ) {
-
-        throw new Error(
-          'Data balita tidak ditemukan.'
-        )
-
-      }
-
-
-      const data =
-        hasilBalita.data
-
-
-      anak.id =
-        data.id
-
-      anak.nama =
-        data.nama || ''
-
-      anak.jenisKelamin =
-        data.jenis_kelamin || ''
-
-      anak.tanggalLahir =
-        normalisasiTanggal(
-          data.tanggal_lahir
-        )
-
-      anak.namaIbu =
-        data.nama_ibu || ''
-
-      anak.alamat =
-        data.alamat || ''
-
-      anak.bbLahir =
-        data.bb_lahir ?? null
-
-      anak.pbLahir =
-        data.pb_lahir ?? null
-
-      anak.pemeriksaan =
-        []
-
-
-      await loadPemeriksaan()
-
-
-    }
-    catch (error) {
-
-      console.error(
-        'Gagal mengambil data balita:',
-        error
+    const responseBalita =
+      await fetch(
+        `${API_URL}/balita/${id}`
       )
 
-      alert(
-        'Data balita gagal dimuat dari server.'
+
+    if (!responseBalita.ok) {
+
+      throw new Error(
+        'Data balita tidak ditemukan.'
       )
 
     }
-    finally {
 
-      loadingData.value =
-        false
+
+    const hasilBalita =
+      await responseBalita.json()
+
+
+    if (
+      !hasilBalita.berhasil ||
+      !hasilBalita.data
+    ) {
+
+      throw new Error(
+        'Data balita tidak ditemukan.'
+      )
 
     }
+
+
+    const data = hasilBalita.data
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MASUKKAN DATA KE OBJEK ANAK
+    |--------------------------------------------------------------------------
+    */
+
+    anak.id =
+      data.id
+
+    anak.nama =
+      data.nama || ''
+
+    anak.jenisKelamin =
+      data.jenis_kelamin || ''
+
+    anak.tanggalLahir =
+      normalisasiTanggal(
+        data.tanggal_lahir
+      )
+
+    anak.namaIbu =
+      data.nama_ibu || ''
+
+    anak.alamat =
+      data.alamat || ''
+
+    anak.bbLahir =
+  data.bb_lahir ?? null
+
+anak.pbLahir =
+  data.pb_lahir ?? null
+    anak.pemeriksaan =
+      []
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AMBIL DATA PEMERIKSAAN
+    |--------------------------------------------------------------------------
+    */
+
+    await loadPemeriksaan()
+
 
   }
+  catch (error) {
+
+    console.error(
+      'Gagal mengambil data balita:',
+      error
+    )
+
+    alert(
+      'Data balita gagal dimuat dari server.'
+    )
+
+  }
+  finally {
+
+    loadingData.value = false
+
+  }
+
+}
 
 
 /*
@@ -1585,129 +1558,129 @@ const loadBalita =
 |--------------------------------------------------------------------------
 */
 
-const loadPemeriksaan =
-  async () => {
+const loadPemeriksaan = async () => {
 
-    try {
+  try {
 
-      const response =
-        await fetch(
-          `${API_URL}/anak/${id}/pemeriksaan`
-        )
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          'Data pemeriksaan gagal diambil.'
-        )
-
-      }
-
-
-      const hasil =
-        await response.json()
-
-
-      if (
-        !hasil.berhasil ||
-        !Array.isArray(hasil.data)
-      ) {
-
-        anak.pemeriksaan =
-          []
-
-        return
-
-      }
-
-
-      anak.pemeriksaan =
-        hasil.data.map(
-          item => ({
-
-            id:
-              item.id,
-
-            tanggal:
-              normalisasiTanggal(
-                item.tanggal_pemeriksaan
-              ),
-
-            tb:
-              item.tb !== null &&
-              item.tb !== undefined
-                ? Number(item.tb)
-                : null,
-
-            bb:
-              item.bb !== null &&
-              item.bb !== undefined
-                ? Number(item.bb)
-                : null,
-
-            lk:
-              item.lk !== null &&
-              item.lk !== undefined
-                ? Number(item.lk)
-                : null,
-
-            lila:
-              item.lila !== null &&
-              item.lila !== undefined
-                ? Number(item.lila)
-                : null,
-
-            imunisasi:
-              item.imunisasi === true ||
-              item.imunisasi === 1,
-
-            vitaminA:
-              item.vitamin_a === true ||
-              item.vitamin_a === 1,
-
-            obatCacing:
-              item.obat_cacing === true ||
-              item.obat_cacing === 1,
-
-            status:
-              null,
-
-            zScore:
-              null,
-
-            percentile:
-              null,
-
-            hasilWHO:
-              null
-
-          })
-        )
-
-
-      await hitungSemuaHistoriWHO()
-
-
-    }
-    catch (error) {
-
-      console.error(
-        'Gagal mengambil pemeriksaan:',
-        error
+    const response =
+      await fetch(
+        `${API_URL}/balita/${id}/pemeriksaan`
       )
 
-      anak.pemeriksaan =
-        []
+
+    if (!response.ok) {
+
+      throw new Error(
+        'Data pemeriksaan gagal diambil.'
+      )
 
     }
 
+
+    const hasil =
+      await response.json()
+
+
+    if (
+      !hasil.berhasil ||
+      !Array.isArray(hasil.data)
+    ) {
+
+      anak.pemeriksaan = []
+
+      return
+
+    }
+
+
+    anak.pemeriksaan =
+      hasil.data.map(
+        item => ({
+
+          id:
+            item.id,
+
+          tanggal:
+            normalisasiTanggal(
+              item.tanggal_pemeriksaan
+            ),
+
+          tb:
+            item.tb !== null &&
+            item.tb !== undefined
+              ? Number(item.tb)
+              : null,
+
+          bb:
+            item.bb !== null &&
+            item.bb !== undefined
+              ? Number(item.bb)
+              : null,
+
+          lk:
+            item.lk !== null &&
+            item.lk !== undefined
+              ? Number(item.lk)
+              : null,
+
+          lila:
+            item.lila !== null &&
+            item.lila !== undefined
+              ? Number(item.lila)
+              : null,
+
+          imunisasi:
+            item.imunisasi === true ||
+            item.imunisasi === 1,
+
+          vitaminA:
+            item.vitamin_a === true ||
+            item.vitamin_a === 1,
+
+          obatCacing:
+            item.obat_cacing === true ||
+            item.obat_cacing === 1,
+
+          status:
+            null,
+
+          zScore:
+            null,
+
+          percentile:
+            null
+
+        })
+      )
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | HITUNG WHO UNTUK SEMUA HISTORI
+    |--------------------------------------------------------------------------
+    */
+
+    await hitungSemuaHistoriWHO()
+
+
   }
+  catch (error) {
+
+    console.error(
+      'Gagal mengambil pemeriksaan:',
+      error
+    )
+
+    anak.pemeriksaan = []
+
+  }
+
+}
 
 
 /*
 |--------------------------------------------------------------------------
-| HISTORI TERBARU
+| TAB — HISTORI TERBARU
 |--------------------------------------------------------------------------
 */
 
@@ -1766,35 +1739,34 @@ const kunjunganTerakhir =
 |--------------------------------------------------------------------------
 */
 
-const resetForm =
-  () => {
+const resetForm = () => {
 
-    form.value = {
+  form.value = {
 
-      id: null,
+    id: null,
 
-      tanggal:
-        new Date()
-          .toISOString()
-          .split('T')[0],
+    tanggal:
+      new Date()
+        .toISOString()
+        .split('T')[0],
 
-      tb: '',
+    tb: '',
 
-      bb: '',
+    bb: '',
 
-      lk: '',
+    lk: '',
 
-      lila: '',
+    lila: '',
 
-      imunisasi: false,
+    imunisasi: false,
 
-      vitaminA: false,
+    vitaminA: false,
 
-      obatCacing: false
-
-    }
+    obatCacing: false
 
   }
+
+}
 
 
 /*
@@ -1803,18 +1775,15 @@ const resetForm =
 |--------------------------------------------------------------------------
 */
 
-const bukaFormTambah =
-  () => {
+const bukaFormTambah = () => {
 
-    mode.value =
-      'tambah'
+  mode.value = 'tambah'
 
-    resetForm()
+  resetForm()
 
-    showModal.value =
-      true
+  showModal.value = true
 
-  }
+}
 
 
 /*
@@ -1823,49 +1792,46 @@ const bukaFormTambah =
 |--------------------------------------------------------------------------
 */
 
-const bukaFormEdit =
-  (item) => {
+const bukaFormEdit = (item) => {
 
-    mode.value =
-      'edit'
+  mode.value = 'edit'
 
 
-    form.value = {
+  form.value = {
 
-      id:
-        item.id,
+    id:
+      item.id,
 
-      tanggal:
-        item.tanggal,
+    tanggal:
+      item.tanggal,
 
-      tb:
-        item.tb ?? '',
+    tb:
+      item.tb ?? '',
 
-      bb:
-        item.bb ?? '',
+    bb:
+      item.bb ?? '',
 
-      lk:
-        item.lk ?? '',
+    lk:
+      item.lk ?? '',
 
-      lila:
-        item.lila ?? '',
+    lila:
+      item.lila ?? '',
 
-      imunisasi:
-        item.imunisasi === true,
+    imunisasi:
+      item.imunisasi === true,
 
-      vitaminA:
-        item.vitaminA === true,
+    vitaminA:
+      item.vitaminA === true,
 
-      obatCacing:
-        item.obatCacing === true
-
-    }
-
-
-    showModal.value =
-      true
+    obatCacing:
+      item.obatCacing === true
 
   }
+
+
+  showModal.value = true
+
+}
 
 
 /*
@@ -1874,13 +1840,11 @@ const bukaFormEdit =
 |--------------------------------------------------------------------------
 */
 
-const tutupModal =
-  () => {
+const tutupModal = () => {
 
-    showModal.value =
-      false
+  showModal.value = false
 
-  }
+}
 
 
 /*
@@ -1889,105 +1853,108 @@ const tutupModal =
 |--------------------------------------------------------------------------
 */
 
-const hitungWHO =
-  async (pemeriksaan) => {
+const hitungWHO = async (pemeriksaan) => {
 
-    if (!pemeriksaan) {
+  if (!pemeriksaan) {
 
-      hasilWHO.value =
-        null
+    hasilWHO.value = null
 
-      return null
-
-    }
-
-
-    if (
-      pemeriksaan.tb === null ||
-      pemeriksaan.tb === undefined ||
-      pemeriksaan.tb === ''
-    ) {
-
-      hasilWHO.value = {
-
-        berhasil: false,
-
-        pesan:
-          'TB/PB belum tersedia sehingga status TB/PB menurut umur belum dapat dihitung.'
-
-      }
-
-      return hasilWHO.value
-
-    }
-
-
-    sedangMenghitung.value =
-      true
-
-
-    try {
-
-      const hasil =
-        await hitungStatusWHO({
-
-          tanggalLahir:
-            anak.tanggalLahir,
-
-          tanggalPemeriksaan:
-            pemeriksaan.tanggal,
-
-          jenisKelamin:
-            anak.jenisKelamin,
-
-          tb:
-            pemeriksaan.tb,
-
-          bb:
-            pemeriksaan.bb,
-
-          lk:
-            pemeriksaan.lk
-
-        })
-
-
-      hasilWHO.value =
-        hasil
-
-
-      return hasil
-
-    }
-    catch (error) {
-
-      console.error(
-        'Gagal menghitung WHO:',
-        error
-      )
-
-
-      hasilWHO.value = {
-
-        berhasil: false,
-
-        pesan:
-          'Perhitungan WHO gagal dilakukan.'
-
-      }
-
-
-      return hasilWHO.value
-
-    }
-    finally {
-
-      sedangMenghitung.value =
-        false
-
-    }
+    return null
 
   }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | TB/PB WAJIB ADA UNTUK STUNTING
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    pemeriksaan.tb === null ||
+    pemeriksaan.tb === undefined ||
+    pemeriksaan.tb === ''
+  ) {
+
+    hasilWHO.value = {
+
+      berhasil: false,
+
+      pesan:
+        'TB/PB belum tersedia sehingga status TB/PB menurut umur belum dapat dihitung.'
+
+    }
+
+    return hasilWHO.value
+
+  }
+
+
+  sedangMenghitung.value = true
+
+
+  try {
+
+    const hasil =
+      await hitungStatusWHO({
+
+        tanggalLahir:
+          anak.tanggalLahir,
+
+        tanggalPemeriksaan:
+          pemeriksaan.tanggal,
+
+        jenisKelamin:
+          anak.jenisKelamin,
+
+        tb:
+          pemeriksaan.tb,
+
+        bb:
+          pemeriksaan.bb,
+
+        lk:
+          pemeriksaan.lk
+
+      })
+
+
+    hasilWHO.value =
+      hasil
+
+
+    return hasil
+
+  }
+  catch (error) {
+
+    console.error(
+      'Gagal menghitung WHO:',
+      error
+    )
+
+
+    hasilWHO.value = {
+
+      berhasil: false,
+
+      pesan:
+        'Perhitungan WHO gagal dilakukan.'
+
+    }
+
+
+    return hasilWHO.value
+
+  }
+  finally {
+
+    sedangMenghitung.value =
+      false
+
+  }
+
+}
 
 
 /*
@@ -2000,9 +1967,7 @@ const hitungStatusWHOData =
   async (pemeriksaan) => {
 
     if (!pemeriksaan) {
-
       return null
-
     }
 
 
@@ -2114,9 +2079,6 @@ const hitungSemuaHistoriWHO =
         pemeriksaan.percentile =
           hasil.percentile
 
-        pemeriksaan.hasilWHO =
-          hasil
-
       }
       else {
 
@@ -2127,9 +2089,6 @@ const hitungSemuaHistoriWHO =
           null
 
         pemeriksaan.percentile =
-          null
-
-        pemeriksaan.hasilWHO =
           null
 
       }
@@ -2148,6 +2107,12 @@ const hitungSemuaHistoriWHO =
 const simpanPemeriksaan =
   async () => {
 
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI DATA DASAR
+    |--------------------------------------------------------------------------
+    */
+
     if (
       !form.value.tanggal ||
       form.value.tb === '' ||
@@ -2165,6 +2130,12 @@ const simpanPemeriksaan =
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI LAYANAN
+    |--------------------------------------------------------------------------
+    */
+
     if (
       typeof form.value.imunisasi !== 'boolean' ||
       typeof form.value.vitaminA !== 'boolean' ||
@@ -2180,6 +2151,12 @@ const simpanPemeriksaan =
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI TB
+    |--------------------------------------------------------------------------
+    */
+
     if (
       Number(form.value.tb) < 30 ||
       Number(form.value.tb) > 150
@@ -2193,6 +2170,12 @@ const simpanPemeriksaan =
 
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI BB
+    |--------------------------------------------------------------------------
+    */
 
     if (
       Number(form.value.bb) < 1 ||
@@ -2208,6 +2191,12 @@ const simpanPemeriksaan =
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI LK
+    |--------------------------------------------------------------------------
+    */
+
     if (
       Number(form.value.lk) < 25 ||
       Number(form.value.lk) > 70
@@ -2222,6 +2211,12 @@ const simpanPemeriksaan =
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDASI LILA
+    |--------------------------------------------------------------------------
+    */
+
     if (
       Number(form.value.lila) < 5 ||
       Number(form.value.lila) > 30
@@ -2235,6 +2230,12 @@ const simpanPemeriksaan =
 
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATA YANG DIKIRIM KE BACKEND
+    |--------------------------------------------------------------------------
+    */
 
     const payload = {
 
@@ -2270,13 +2271,19 @@ const simpanPemeriksaan =
       let response
 
 
+      /*
+      |--------------------------------------------------------------------------
+      | TAMBAH
+      |--------------------------------------------------------------------------
+      */
+
       if (
         mode.value === 'tambah'
       ) {
 
         response =
           await fetch(
-            `${API_URL}/anak/${id}/pemeriksaan`,
+            `${API_URL}/balita/${id}/pemeriksaan`,
             {
 
               method: 'POST',
@@ -2295,6 +2302,14 @@ const simpanPemeriksaan =
           )
 
       }
+
+
+      /*
+      |--------------------------------------------------------------------------
+      | EDIT
+      |--------------------------------------------------------------------------
+      */
+
       else {
 
         response =
@@ -2320,14 +2335,17 @@ const simpanPemeriksaan =
       }
 
 
+      /*
+      |--------------------------------------------------------------------------
+      | CEK RESPONSE
+      |--------------------------------------------------------------------------
+      */
+
       const hasil =
         await response.json()
 
 
-      if (
-        !response.ok ||
-        !hasil.berhasil
-      ) {
+      if (!response.ok || !hasil.berhasil) {
 
         throw new Error(
           hasil.pesan ||
@@ -2337,8 +2355,25 @@ const simpanPemeriksaan =
       }
 
 
+      /*
+      |--------------------------------------------------------------------------
+      | AMBIL ULANG DATA DARI MYSQL
+      |--------------------------------------------------------------------------
+      |
+      | Kita tidak langsung push hasil form ke array.
+      | Data diambil ulang dari database supaya tampilan
+      | benar-benar mengikuti data MySQL.
+      |--------------------------------------------------------------------------
+      */
+
       await loadPemeriksaan()
 
+
+      /*
+      |--------------------------------------------------------------------------
+      | HITUNG WHO TERBARU
+      |--------------------------------------------------------------------------
+      */
 
       if (
         pemeriksaanTerbaru.value.length > 0
@@ -2357,8 +2392,15 @@ const simpanPemeriksaan =
       }
 
 
+      /*
+      |--------------------------------------------------------------------------
+      | TUTUP MODAL
+      |--------------------------------------------------------------------------
+      */
+
       showModal.value =
         false
+
 
     }
     catch (error) {
@@ -2395,9 +2437,7 @@ const hapusPemeriksaan =
 
 
     if (!yakin) {
-
       return
-
     }
 
 
@@ -2429,8 +2469,20 @@ const hapusPemeriksaan =
       }
 
 
+      /*
+      |--------------------------------------------------------------------------
+      | LOAD ULANG DATA MYSQL
+      |--------------------------------------------------------------------------
+      */
+
       await loadPemeriksaan()
 
+
+      /*
+      |--------------------------------------------------------------------------
+      | TAMPILKAN HASIL WHO TERBARU
+      |--------------------------------------------------------------------------
+      */
 
       if (
         pemeriksaanTerbaru.value.length > 0
@@ -2447,6 +2499,7 @@ const hapusPemeriksaan =
           null
 
       }
+
 
     }
     catch (error) {
@@ -2477,9 +2530,7 @@ const formatTanggal =
   (tanggal) => {
 
     if (!tanggal) {
-
       return '-'
-
     }
 
 
@@ -2488,17 +2539,11 @@ const formatTanggal =
 
 
     if (!tanggalNormal) {
-
       return '-'
-
     }
 
 
-    const [
-      tahun,
-      bulan,
-      hari
-    ] =
+    const [tahun, bulan, hari] =
       tanggalNormal
         .split('-')
         .map(Number)
@@ -2647,7 +2692,7 @@ const hitungUmurDariTanggal =
 
 /*
 |--------------------------------------------------------------------------
-| FORMAT UMUR WHO
+| UMUR WHO
 |--------------------------------------------------------------------------
 */
 
@@ -2669,8 +2714,11 @@ const formatUmurWHO =
 
 
     return hitungUmurDariTanggal(
+
       anak.tanggalLahir,
+
       pemeriksaan.tanggal
+
     )
 
   }
@@ -2678,7 +2726,7 @@ const formatUmurWHO =
 
 /*
 |--------------------------------------------------------------------------
-| HITUNG UMUR ANAK
+| UMUR PROFILE
 |--------------------------------------------------------------------------
 */
 
@@ -2686,9 +2734,7 @@ const hitungUmur =
   (tanggalLahir) => {
 
     if (!tanggalLahir) {
-
       return '-'
-
     }
 
 
@@ -2705,8 +2751,11 @@ const hitungUmur =
 
 
     return hitungUmurDariTanggal(
+
       tanggalLahir,
+
       tanggalHariIni
+
     )
 
   }
@@ -2714,120 +2763,111 @@ const hitungUmur =
 
 /*
 |--------------------------------------------------------------------------
-| ON MOUNTED
+| SAAT HALAMAN DIBUKA
 |--------------------------------------------------------------------------
 */
 
-onMounted(
-  async () => {
+onMounted(async () => {
 
-    await loadBalita()
+  await loadBalita()
 
 
-    if (
-      pemeriksaanTerbaru.value.length > 0
-    ) {
+  /*
+  |--------------------------------------------------------------------------
+  | TAMPILKAN WHO TERBARU
+  |--------------------------------------------------------------------------
+  */
 
-      await hitungWHO(
-        pemeriksaanTerbaru.value[0]
-      )
+  if (
+    pemeriksaanTerbaru.value.length > 0
+  ) {
 
-    }
+    await hitungWHO(
+      pemeriksaanTerbaru.value[0]
+    )
 
   }
-)
+
+})
 
 </script>
 
 
 <style scoped>
 
+/*
+|--------------------------------------------------------------------------
+| PERBAIKAN HEADER DETAIL BALITA
+|--------------------------------------------------------------------------
+*/
+
 .detail-profile-name {
-
   display: flex;
-
   flex-direction: column;
-
   align-items: flex-start;
-
   justify-content: flex-start;
-
   text-align: left;
-
   gap: 7px;
-
 }
 
 
 .detail-profile-name h1 {
-
   margin: 0;
-
   text-align: left;
-
 }
 
 
 .detail-profile-name .status-normal {
-
   display: inline-block;
-
   width: fit-content;
-
   text-align: left;
-
   line-height: 1.2;
-
 }
 
 
 .profile-main {
-
   text-align: left;
-
   align-items: flex-start;
-
 }
 
 
 .profile-main > p {
-
   text-align: left;
-
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| JARAK DARI TAB KE GRAFIK
+|--------------------------------------------------------------------------
+*/
 
 .growth-chart-container {
-
   margin-top: 30px;
-
 }
 
 
+/*
+|--------------------------------------------------------------------------
+| JARAK ANTAR GRAFIK
+|--------------------------------------------------------------------------
+*/
+
 .growth-chart-section {
-
   margin-bottom: 35px;
-
 }
 
 
 .growth-chart-section h3 {
-
   margin-bottom: 12px;
-
 }
 
 
 .growth-chart-description {
-
   margin-top: -4px;
-
   margin-bottom: 15px;
-
   font-size: 13px;
-
   color: #6b7280;
-
 }
 
 
@@ -2838,231 +2878,11 @@ onMounted(
 */
 
 .history-table-spacing {
-
   margin-top: 30px;
-
   margin-bottom: 30px;
-
   position: relative;
-
   display: block;
-
   width: 100%;
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| HASIL PEMANTAUAN
-|--------------------------------------------------------------------------
-*/
-
-.monitoring-result {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 16px;
-
-  margin-top: 25px;
-
-}
-
-
-.monitoring-card {
-
-  background: #f8fafc;
-
-  border: 1px solid #e5e7eb;
-
-  border-radius: 12px;
-
-  padding: 18px;
-
-}
-
-
-.monitoring-card-header {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 12px;
-
-  margin-bottom: 15px;
-
-}
-
-
-.monitoring-card-header > div {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 8px;
-
-}
-
-
-.monitoring-card-header strong {
-
-  font-size: 14px;
-
-  color: #374151;
-
-}
-
-
-.monitoring-icon {
-
-  font-size: 18px;
-
-}
-
-
-.monitoring-value {
-
-  font-size: 24px;
-
-  font-weight: 700;
-
-  color: #172554;
-
-  margin-bottom: 8px;
-
-}
-
-
-.monitoring-card p {
-
-  margin: 0;
-
-  font-size: 13px;
-
-  line-height: 1.5;
-
-  color: #6b7280;
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| INFO WHO
-|--------------------------------------------------------------------------
-*/
-
-.who-info {
-
-  display: flex;
-
-  align-items: flex-start;
-
-  gap: 10px;
-
-  margin-top: 20px;
-
-  padding: 12px 15px;
-
-  background: #eff6ff;
-
-  border: 1px solid #dbeafe;
-
-  border-radius: 8px;
-
-  color: #374151;
-
-}
-
-
-.who-info span {
-
-  flex-shrink: 0;
-
-}
-
-
-.who-info p {
-
-  margin: 0;
-
-  font-size: 13px;
-
-  line-height: 1.5;
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| LOADING WHO
-|--------------------------------------------------------------------------
-*/
-
-.who-loading {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 10px;
-
-  padding: 35px;
-
-  color: #6b7280;
-
-}
-
-
-.loading-spinner {
-
-  width: 20px;
-
-  height: 20px;
-
-  border: 3px solid #e5e7eb;
-
-  border-top-color: #4f46e5;
-
-  border-radius: 50%;
-
-  animation: spin 0.8s linear infinite;
-
-}
-
-
-@keyframes spin {
-
-  to {
-
-    transform: rotate(360deg);
-
-  }
-
-}
-
-
-.who-empty {
-
-  padding: 35px;
-
-  text-align: center;
-
-  color: #6b7280;
-
-  background: #f9fafb;
-
-  border-radius: 10px;
-
 }
 
 
@@ -3073,48 +2893,33 @@ onMounted(
 */
 
 .yes-no-choice {
-
   display: flex;
-
   gap: 10px;
-
   margin-top: 8px;
-
   width: 100%;
-
 }
 
 
 .choice-button {
-
   flex: 1;
-
   min-height: 44px;
-
   padding: 10px 16px;
 
   border: 1px solid #d1d5db;
-
   border-radius: 8px;
 
   background: #ffffff;
-
   color: #374151;
 
   font-family: inherit;
-
   font-size: 14px;
-
   font-weight: 500;
 
   cursor: pointer;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   gap: 7px;
 
   transition:
@@ -3122,77 +2927,39 @@ onMounted(
     border-color 0.2s ease,
     color 0.2s ease,
     box-shadow 0.2s ease;
-
 }
 
 
 .choice-button:hover {
-
   border-color: #9ca3af;
-
   background: #f9fafb;
-
 }
 
 
 .choice-button.selected {
-
   font-weight: 600;
-
 }
 
 
 .choice-button.choice-yes.selected {
-
   background: #ecfdf5;
-
   border-color: #10b981;
-
   color: #047857;
-
-  box-shadow:
-    0 0 0 1px #10b981;
-
+  box-shadow: 0 0 0 1px #10b981;
 }
 
 
 .choice-button.choice-no.selected {
-
   background: #fef2f2;
-
   border-color: #ef4444;
-
   color: #dc2626;
-
-  box-shadow:
-    0 0 0 1px #ef4444;
-
+  box-shadow: 0 0 0 1px #ef4444;
 }
 
 
 .choice-button span {
-
   font-size: 16px;
-
   font-weight: 700;
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| RESPONSIVE HASIL PEMANTAUAN
-|--------------------------------------------------------------------------
-*/
-
-@media (max-width: 900px) {
-
-  .monitoring-result {
-
-    grid-template-columns: 1fr;
-
-  }
-
 }
 
 </style>
