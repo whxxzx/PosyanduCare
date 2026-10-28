@@ -395,32 +395,40 @@
                   </td>
 
 
-                  <!-- AKSI -->
-                  <td>
+                  
+<!-- AKSI -->
+<td>
+  <div class="action-buttons">
 
-                    <div class="action-buttons">
+    <button
+      class="btn-view"
+      @click="lihatDetail(anak.id)"
+    >
+      Lihat
+    </button>
 
-                      <button
-                        class="btn-view"
-                        @click="lihatDetail(
-                          anak.id
-                        )"
-                      >
-                        Lihat
-                      </button>
+    <button
+      class="btn-edit"
+      @click="bukaFormEdit(anak)"
+    >
+      Edit
+    </button>
 
-                      <button
-                        class="btn-edit"
-                        @click="bukaFormEdit(
-                          anak
-                        )"
-                      >
-                        Edit
-                      </button>
+    <button
+      class="btn-delete"
+      :disabled="sedangMenghapusId === anak.id"
+      @click="hapusBalita(anak)"
+    >
+      {{
+        sedangMenghapusId === anak.id
+          ? 'Menghapus...'
+          : 'Hapus'
+      }}
+    </button>
 
-                    </div>
+  </div>
+</td>
 
-                  </td>
 
                 </tr>
 
@@ -673,6 +681,9 @@ import {
   tentukanKategoriAnak,
   formatUmurAnak
 } from '../utils/kategoriAnak'
+
+
+const sedangMenghapusId = ref(null)
 
 
 /* =========================================================
@@ -1152,6 +1163,49 @@ const lihatDetail =
 
   }
 
+
+/* =========================================================
+   HAPUS DATA BALITA
+========================================================= */
+
+const hapusBalita = async (anak) => {
+  const konfirmasi = window.confirm(
+    `Apakah data anak "${anak.nama}" akan dihapus? Data yang sudah dihapus tidak dapat dipulihkan.`
+  )
+
+  if (!konfirmasi) return
+
+  try {
+    sedangMenghapusId.value = anak.id
+
+    const response = await fetch(
+      `http://localhost:3000/api/anak/${anak.id}`,
+      {
+        method: 'DELETE'
+      }
+    )
+
+    const hasil = await response.json().catch(() => ({}))
+
+    if (!response.ok || hasil.berhasil === false) {
+      throw new Error(
+        hasil.pesan || 'Data anak gagal dihapus.'
+      )
+    }
+
+    alert(hasil.pesan || 'Data anak berhasil dihapus.')
+
+    await ambilDataBalita()
+  } catch (error) {
+    console.error('Gagal menghapus data balita:', error)
+
+    alert(
+      error.message || 'Terjadi kesalahan saat menghapus data anak.'
+    )
+  } finally {
+    sedangMenghapusId.value = null
+  }
+}
 
 /* =========================================================
    TAMBAH
@@ -2166,5 +2220,31 @@ tbody tr:hover {
 .btn-cancel:hover {
   background: #f8fafc;
 }
+
+
+/* =========================================================
+   TOMBOL HAPUS
+========================================================= */
+
+.btn-delete {
+  padding: 7px 11px;
+  border: 1px solid #fecaca;
+  border-radius: 7px;
+  background: #fef2f2;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-delete:hover {
+  background: #fee2e2;
+}
+
+.btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 
 </style>
