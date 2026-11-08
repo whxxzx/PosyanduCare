@@ -10,7 +10,7 @@
       </div>
 
       <div class="posyandu-name">
-        Posyandu Melati
+        Posyandu Sedap Malam 2
       </div>
 
       <nav>
@@ -244,7 +244,202 @@
 
         </div>
 
+         <!-- =========================
+             STATUS PERTUMBUHAN WHO
+        ========================== -->
 
+        <div class="dashboard-panel who-status-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h3>
+                Status Pertumbuhan
+              </h3>
+
+              <p class="panel-description">
+                Berdasarkan indikator TB/PB menurut umur
+              </p>
+
+            </div>
+
+            <span
+              v-if="hasilWHO?.berhasil"
+              :class="[
+                'who-status-badge',
+                hasilWHO.status === 'Normal'
+                  ? 'who-normal'
+                  : 'who-stunted'
+              ]"
+            >
+
+              {{
+                hasilWHO.status === 'Normal'
+                  ? 'Normal'
+                  : hasilWHO.status
+              }}
+
+            </span>
+
+          </div>
+          <!-- LOADING -->
+
+          <div
+            v-if="sedangMenghitung"
+            class="who-loading"
+          >
+
+            <span class="loading-spinner"></span>
+
+            Menghitung berdasarkan standar WHO...
+
+          </div>
+
+
+          <!-- HASIL -->
+
+          <div
+            v-else-if="hasilWHO?.berhasil"
+            class="who-result"
+          >
+
+
+            <div class="who-result-main">
+
+              <div class="who-status-icon">
+
+                {{
+                  hasilWHO.status === 'Normal'
+                    ? '✓'
+                    : '!'
+                }}
+
+              </div>
+
+
+              <div>
+
+                <h2>
+
+                  {{
+                    hasilWHO.status === 'Normal'
+                      ? 'Tidak Stunting'
+                      : 'Terindikasi Stunting'
+                  }}
+
+                </h2>
+
+                <p>
+                  {{ hasilWHO.keterangan }}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="who-metrics">
+
+
+              <div class="who-metric">
+
+                <span>
+                  TB/PB
+                </span>
+
+                <strong>
+                  {{ pemeriksaanTerbaru[0]?.tb }} cm
+                </strong>
+
+              </div>
+
+
+              <!-- UMUR -->
+
+              <div class="who-metric">
+
+                <span>
+                  Umur
+                </span>
+
+                <strong>
+                  {{ formatUmurWHO() }}
+                </strong>
+
+              </div>
+
+
+              <div class="who-metric">
+
+                <span>
+                  Z-score
+                </span>
+
+                <strong>
+
+                  {{
+                    hasilWHO.zScore
+                  }}
+
+                  SD
+
+                </strong>
+
+              </div>
+
+
+              <div class="who-metric">
+
+                <span>
+                  Indikator
+                </span>
+
+                <strong>
+                  TB/PB menurut umur
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <div class="who-info">
+
+              <span>
+                ℹ️
+              </span>
+
+              <p>
+
+                Hasil ini merupakan perhitungan
+                antropometri berdasarkan standar
+                pertumbuhan WHO dan bukan diagnosis
+                medis.
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- ERROR -->
+
+          <div
+            v-else
+            class="who-empty"
+          >
+
+            Belum ada hasil perhitungan.
+
+          </div>
+
+        </div>
+
+
+
+        
         <!-- =====================================================
              TABS
         ====================================================== -->
@@ -301,8 +496,7 @@
 
         <div
           v-if="activeTab === 'histori'"
-          class="dashboard-panel"
-        >
+          class="dashboard-panel" style="margin-top: 10px;">
 
           <div class="panel-header">
 
@@ -545,8 +739,7 @@
 
         <div
           v-if="activeTab === 'pemantauan'"
-          class="dashboard-panel"
-        >
+          class="dashboard-panel" style="margin-top: 10px;">
 
           <div class="panel-header">
 

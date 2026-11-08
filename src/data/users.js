@@ -5,7 +5,7 @@ const users = [
     password: '123456',
     nama: 'Siti Aminah',
     jabatan: 'Kader Posyandu',
-    posyandu: 'Posyandu Melati'
+    posyandu: 'Posyandu Sedap Malam 2'
   }
 ]
 

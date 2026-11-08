@@ -474,165 +474,124 @@
     </main>
 
 
-    <!-- MODAL -->
+    <!-- MODAL TAMBAH / EDIT DATA ANAK -->
     <div
       v-if="showModal"
       class="modal-overlay"
       @click.self="tutupForm"
     >
-
-      <div class="modal-box">
-
+      <div
+        class="modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="judul-modal"
+      >
         <div class="modal-header">
-
           <div>
-
-            <h2>
-
-              {{
-                modeForm === 'tambah'
-                  ? 'Tambah Data Anak'
-                  : 'Edit Data Anak'
-              }}
-
-            </h2>
-
+            <h3 id="judul-modal">
+              {{ modeForm === 'tambah' ? 'Tambah Data Anak' : 'Edit Data Anak' }}
+            </h3>
             <p>
-
-              {{
-                modeForm === 'tambah'
-                  ? 'Masukkan data anak baru.'
-                  : 'Ubah informasi data anak.'
-              }}
-
+              {{ modeForm === 'tambah' ? 'Lengkapi data balita.' : 'Ubah informasi data balita.' }}
             </p>
-
           </div>
-
 
           <button
+            type="button"
             class="modal-close"
+            aria-label="Tutup formulir"
             @click="tutupForm"
           >
-            ✕
+            ×
           </button>
-
         </div>
 
-
-        <form
-          @submit.prevent="simpanDataBalita"
-        >
-
-          <!-- NAMA -->
+        <form @submit.prevent="simpanDataBalita">
           <div class="form-group">
-
-            <label>
-              Nama Anak
-            </label>
-
+            <label for="nama-anak">Nama Anak *</label>
             <input
-              v-model="form.nama"
+              id="nama-anak"
+              v-model.trim="form.nama"
               type="text"
-              placeholder="Masukkan nama anak"
+              placeholder="Masukkan nama lengkap anak"
+              required
             />
-
           </div>
 
-
-          <!-- JENIS KELAMIN -->
           <div class="form-group">
-
-            <label>
-              Jenis Kelamin
-            </label>
-
+            <label for="jenis-kelamin">Jenis Kelamin *</label>
             <select
+              id="jenis-kelamin"
               v-model="form.jenisKelamin"
+              required
             >
-
-              <option value="">
+              <option value="" disabled>
                 Pilih jenis kelamin
               </option>
-
-              <option value="L">
-                Laki-laki
-              </option>
-
-              <option value="P">
-                Perempuan
-              </option>
-
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
             </select>
-
           </div>
 
-
-          <!-- TANGGAL LAHIR -->
           <div class="form-group">
-
-            <label>
-              Tanggal Lahir
-            </label>
-
+            <label for="tanggal-lahir">Tanggal Lahir *</label>
             <input
+              id="tanggal-lahir"
               v-model="form.tanggalLahir"
               type="date"
               :max="tanggalHariIni"
+              required
             />
-
           </div>
 
+          <div
+            v-if="form.tanggalLahir"
+            class="age-preview"
+          >
+            Usia anak:
+            {{ formatUmurAnak(form.tanggalLahir) }}
 
-          <!-- NAMA IBU -->
+            <p v-if="kategoriForm === 'Balita'">
+              Anak termasuk kategori Balita.
+            </p>
+
+            <p v-else>
+              Kategori saat ini:
+              {{ kategoriForm || 'Tidak diketahui' }}.
+              Data hanya dapat disimpan jika termasuk kategori Balita.
+            </p>
+          </div>
+
           <div class="form-group">
-
-            <label>
-              Nama Ibu
-            </label>
-
+            <label for="nama-ibu">Nama Ibu *</label>
             <input
-              v-model="form.namaIbu"
+              id="nama-ibu"
+              v-model.trim="form.namaIbu"
               type="text"
               placeholder="Masukkan nama ibu"
+              required
             />
-
           </div>
 
-
-          <!-- ALAMAT -->
           <div class="form-group">
-
-            <label>
-              Alamat
-            </label>
-
+            <label for="alamat-anak">Alamat</label>
             <textarea
-              v-model="form.alamat"
+              id="alamat-anak"
+              v-model.trim="form.alamat"
               rows="3"
-              placeholder="Masukkan alamat"
+              placeholder="Masukkan alamat anak"
             ></textarea>
-
           </div>
 
-
-          <!-- ERROR -->
-          <div
-            v-if="errorForm"
-            class="form-error"
-          >
-
+          <p v-if="errorForm" class="form-error">
             {{ errorForm }}
+          </p>
 
-          </div>
-
-
-          <!-- ACTION -->
           <div class="modal-actions">
-
             <button
               type="button"
-              class="btn-cancel"
+              class="btn-modal-cancel"
+              :disabled="sedangMenyimpan"
               @click="tutupForm"
             >
               Batal
@@ -640,23 +599,20 @@
 
             <button
               type="submit"
-              class="btn-primary"
+              class="btn-modal-save"
+              :disabled="sedangMenyimpan"
             >
-
               {{
-                modeForm === 'tambah'
-                  ? 'Simpan Data'
-                  : 'Simpan Perubahan'
+                sedangMenyimpan
+                  ? 'Menyimpan...'
+                  : modeForm === 'tambah'
+                    ? 'Simpan Data'
+                    : 'Simpan Perubahan'
               }}
-
             </button>
-
           </div>
-
         </form>
-
       </div>
-
     </div>
 
   </div>
@@ -684,6 +640,7 @@ import {
 
 
 const sedangMenghapusId = ref(null)
+const sedangMenyimpan = ref(false)
 
 
 /* =========================================================
@@ -802,6 +759,16 @@ const tanggalHariIni =
     return `${tahun}-${bulan}-${hari}`
 
   })
+
+const kategoriForm =
+  computed(() => {
+    if (!form.tanggalLahir) {
+      return ''
+    }
+
+    return tentukanKategoriAnak(form.tanggalLahir)
+  })
+
 
 
 /* =========================================================
@@ -1292,6 +1259,10 @@ const bukaFormEdit =
 const tutupForm =
   () => {
 
+    if (sedangMenyimpan.value) {
+      return
+    }
+
     showModal.value =
       false
 
@@ -1308,203 +1279,87 @@ const tutupForm =
 const simpanDataBalita =
   async () => {
 
-    errorForm.value =
-      ''
-
-
-    /*
-     * VALIDASI
-     */
+    errorForm.value = ''
 
     if (
       !form.nama.trim() ||
       !form.jenisKelamin ||
       !form.tanggalLahir ||
-      !form.alamat.trim()
+      !form.namaIbu.trim()
     ) {
-
       errorForm.value =
-        'Nama, jenis kelamin, tanggal lahir, dan alamat wajib diisi.'
-
+        'Nama anak, jenis kelamin, tanggal lahir, dan nama ibu wajib diisi.'
       return
-
     }
 
-
-    /*
-     * TAMBAH
-     */
+    if (form.tanggalLahir > tanggalHariIni.value) {
+      errorForm.value =
+        'Tanggal lahir tidak boleh melebihi tanggal hari ini.'
+      return
+    }
 
     if (
-      modeForm.value ===
-      'tambah'
+      modeForm.value === 'tambah' &&
+      kategoriForm.value !== 'Balita'
     ) {
-
-      try {
-
-        const response =
-          await fetch(
-            'http://localhost:3000/api/anak',
-            {
-              method:
-                'POST',
-
-              headers: {
-                'Content-Type':
-                  'application/json'
-              },
-
-              body:
-                JSON.stringify({
-
-                  nama:
-                    form.nama.trim(),
-
-                  jenis_kelamin:
-                    form.jenisKelamin,
-
-                  tanggal_lahir:
-                    form.tanggalLahir,
-
-                  alamat:
-                    form.alamat.trim(),
-
-                  nama_ibu:
-                    form.namaIbu.trim() ||
-                    null
-
-                })
-
-            }
-          )
-
-
-        const hasil =
-          await response.json()
-
-
-        if (
-          !response.ok ||
-          !hasil.berhasil
-        ) {
-
-          throw new Error(
-            hasil.pesan ||
-            'Gagal menambahkan data.'
-          )
-
-        }
-
-
-        tutupForm()
-
-        await ambilDataBalita()
-
-        alert(
-          'Data anak berhasil ditambahkan.'
-        )
-
-      }
-      catch (error) {
-
-        console.error(
-          error
-        )
-
-        errorForm.value =
-          error.message ||
-          'Gagal menambahkan data.'
-
-      }
-
-
+      errorForm.value =
+        'Tanggal lahir anak tidak termasuk kategori Balita. Periksa kembali tanggal lahir.'
       return
-
     }
 
-
-    /*
-     * EDIT
-     */
+    sedangMenyimpan.value = true
 
     try {
+      const url =
+        modeForm.value === 'tambah'
+          ? 'http://localhost:3000/api/anak'
+          : `http://localhost:3000/api/anak/${editId.value}`
 
-      const response =
-        await fetch(
-          `http://localhost:3000/api/anak/${editId.value}`,
-          {
-            method:
-              'PUT',
+      const response = await fetch(url, {
+        method: modeForm.value === 'tambah' ? 'POST' : 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nama: form.nama.trim(),
+          jenis_kelamin: form.jenisKelamin,
+          tanggal_lahir: form.tanggalLahir,
+          alamat: form.alamat.trim(),
+          nama_ibu: form.namaIbu.trim()
+        })
+      })
 
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
+      const hasil = await response.json().catch(() => ({}))
 
-            body:
-              JSON.stringify({
-
-                nama:
-                  form.nama.trim(),
-
-                jenis_kelamin:
-                  form.jenisKelamin,
-
-                tanggal_lahir:
-                  form.tanggalLahir,
-
-                alamat:
-                  form.alamat.trim(),
-
-                nama_ibu:
-                  form.namaIbu.trim() ||
-                  null
-
-              })
-
-          }
-        )
-
-
-      const hasil =
-        await response.json()
-
-
-      if (
-        !response.ok ||
-        !hasil.berhasil
-      ) {
-
+      if (!response.ok || hasil.berhasil === false) {
         throw new Error(
           hasil.pesan ||
-          'Gagal memperbarui data.'
+          hasil.message ||
+          (modeForm.value === 'tambah'
+            ? 'Gagal menambahkan data.'
+            : 'Gagal memperbarui data.')
         )
-
       }
 
+      const modeSimpan = modeForm.value
 
-      tutupForm()
-
+      showModal.value = false
       await ambilDataBalita()
 
       alert(
-        'Data anak berhasil diperbarui.'
+        modeSimpan === 'tambah'
+          ? 'Data anak berhasil ditambahkan.'
+          : 'Data anak berhasil diperbarui.'
       )
-
-    }
-    catch (error) {
-
-      console.error(
-        error
-      )
-
+    } catch (error) {
+      console.error('Gagal menyimpan data balita:', error)
       errorForm.value =
-        error.message ||
-        'Gagal memperbarui data.'
-
+        error.message || 'Data gagal disimpan. Periksa koneksi backend.'
+    } finally {
+      sedangMenyimpan.value = false
     }
-
   }
+
 
 
 /* =========================================================
@@ -2034,193 +1889,156 @@ tbody tr:hover {
 
 
 /* =========================================================
-   MODAL
+   TAMBAHAN MODAL
+   CSS di atas dipertahankan
 ========================================================= */
 
 .modal-overlay {
   position: fixed;
-
   inset: 0;
-
+  z-index: 3000;
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   padding: 20px;
-
-  background: rgba(
-    0,
-    0,
-    0,
-    0.45
-  );
-
-  z-index: 1000;
+  background: rgba(15, 23, 42, 0.5);
 }
-
 
 .modal-box {
   width: 100%;
-  max-width: 520px;
-
+  max-width: 500px;
   max-height: 90vh;
-
   overflow-y: auto;
-
   padding: 24px;
-
-  box-sizing: border-box;
-
-  background: white;
-
   border-radius: 14px;
-
-  box-shadow:
-    0 20px 50px
-    rgba(
-      0,
-      0,
-      0,
-      0.2
-    );
+  background: #ffffff;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
-
 
 .modal-header {
   display: flex;
-
+  align-items: center;
   justify-content: space-between;
-
-  align-items: flex-start;
-
+  gap: 12px;
   margin-bottom: 20px;
 }
 
-
-.modal-header h2 {
+.modal-header h3 {
   margin: 0 0 5px;
 }
 
-
 .modal-header p {
   margin: 0;
-
   color: #64748b;
-
-  font-size: 14px;
+  font-size: 13px;
 }
 
-
 .modal-close {
+  flex-shrink: 0;
   border: none;
-
   background: transparent;
-
-  color: #64748b;
-
-  font-size: 20px;
-
+  color: #475569;
+  font-size: 25px;
   cursor: pointer;
 }
 
-
 .form-group {
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 15px;
 }
-
 
 .form-group label {
-  display: block;
-
-  margin-bottom: 7px;
-
-  font-size: 14px;
-
+  font-size: 13px;
   font-weight: 600;
 }
-
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-
-  padding: 10px 12px;
-
   box-sizing: border-box;
-
+  padding: 10px 12px;
   border: 1px solid #d1d5db;
-
-  border-radius: 8px;
-
+  border-radius: 7px;
+  background: #ffffff;
+  color: #334155;
   font-family: inherit;
-
-  font-size: 14px;
+  font-size: 13px;
 }
-
-
-.form-group textarea {
-  resize: vertical;
-}
-
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-
   border-color: #2563eb;
 }
 
-
-.form-error {
+.age-preview {
   padding: 10px 12px;
-
-  margin-bottom: 16px;
-
-  background: #fef2f2;
-
-  color: #dc2626;
-
+  margin-bottom: 15px;
   border-radius: 8px;
-
-  font-size: 13px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
+.age-preview p {
+  margin: 5px 0 0;
+}
+
+.form-error {
+  margin: 0 0 14px;
+  color: #dc2626;
+  font-size: 13px;
+  line-height: 1.5;
+}
 
 .modal-actions {
   display: flex;
-
   justify-content: flex-end;
-
   gap: 10px;
-
   margin-top: 20px;
 }
 
-
-.btn-cancel {
-  padding: 10px 16px;
-
-  border: 1px solid #d1d5db;
-
-  border-radius: 8px;
-
-  background: white;
-
-  color: #374151;
-
-  cursor: pointer;
-
+.btn-modal-cancel,
+.btn-modal-save {
+  padding: 10px 15px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
 }
 
+.btn-modal-cancel {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #475569;
+}
 
-.btn-cancel:hover {
+.btn-modal-save {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btn-modal-cancel:hover {
   background: #f8fafc;
 }
 
+.btn-modal-save:hover {
+  background: #1d4ed8;
+}
+
+.btn-modal-cancel:disabled,
+.btn-modal-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* =========================================================
    TOMBOL HAPUS

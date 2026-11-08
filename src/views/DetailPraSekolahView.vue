@@ -10,7 +10,7 @@
       </div>
 
       <div class="posyandu-name">
-        Posyandu Melati
+        Posyandu Sedap Malam 2
       </div>
 
       <nav>
@@ -40,11 +40,11 @@
       <header class="topbar">
         <div>
           <h2>
-            Detail Balita
+            Detail Pra-Sekolah
           </h2>
 
           <p>
-            Informasi dan pemantauan perkembangan balita
+            Informasi dan pemantauan perkembangan pra-sekolah
           </p>
         </div>
       </header>
@@ -54,7 +54,7 @@
 
         <!-- KEMBALI -->
         <router-link
-          to="/pra-sekolah"
+          to="/Pra-Sekolah"
           class="back-link"
         >
           ← Kembali ke Data Pra-Sekolah
@@ -112,7 +112,7 @@
 
             <div class="panel-header">
               <h3>
-                Informasi Balita
+                Informasi Pra-Sekolah
               </h3>
             </div>
 
@@ -244,7 +244,202 @@
 
         </div>
 
+         <!-- =========================
+             STATUS PERTUMBUHAN WHO
+        ========================== -->
 
+        <div class="dashboard-panel who-status-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h3>
+                Status Pertumbuhan
+              </h3>
+
+              <p class="panel-description">
+                Berdasarkan indikator TB/PB menurut umur
+              </p>
+
+            </div>
+
+            <span
+              v-if="hasilWHO?.berhasil"
+              :class="[
+                'who-status-badge',
+                hasilWHO.status === 'Normal'
+                  ? 'who-normal'
+                  : 'who-stunted'
+              ]"
+            >
+
+              {{
+                hasilWHO.status === 'Normal'
+                  ? 'Normal'
+                  : hasilWHO.status
+              }}
+
+            </span>
+
+          </div>
+          <!-- LOADING -->
+
+          <div
+            v-if="sedangMenghitung"
+            class="who-loading"
+          >
+
+            <span class="loading-spinner"></span>
+
+            Menghitung berdasarkan standar WHO...
+
+          </div>
+
+
+          <!-- HASIL -->
+
+          <div
+            v-else-if="hasilWHO?.berhasil"
+            class="who-result"
+          >
+
+
+            <div class="who-result-main">
+
+              <div class="who-status-icon">
+
+                {{
+                  hasilWHO.status === 'Normal'
+                    ? '✓'
+                    : '!'
+                }}
+
+              </div>
+
+
+              <div>
+
+                <h2>
+
+                  {{
+                    hasilWHO.status === 'Normal'
+                      ? 'Tidak Stunting'
+                      : 'Terindikasi Stunting'
+                  }}
+
+                </h2>
+
+                <p>
+                  {{ hasilWHO.keterangan }}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="who-metrics">
+
+
+              <div class="who-metric">
+
+                <span>
+                  TB/PB
+                </span>
+
+                <strong>
+                  {{ pemeriksaanTerbaru[0]?.tb }} cm
+                </strong>
+
+              </div>
+
+
+              <!-- UMUR -->
+
+              <div class="who-metric">
+
+                <span>
+                  Umur
+                </span>
+
+                <strong>
+                  {{ formatUmurWHO() }}
+                </strong>
+
+              </div>
+
+
+              <div class="who-metric">
+
+                <span>
+                  Z-score
+                </span>
+
+                <strong>
+
+                  {{
+                    hasilWHO.zScore
+                  }}
+
+                  SD
+
+                </strong>
+
+              </div>
+
+
+              <div class="who-metric">
+
+                <span>
+                  Indikator
+                </span>
+
+                <strong>
+                  TB/PB menurut umur
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <div class="who-info">
+
+              <span>
+                ℹ️
+              </span>
+
+              <p>
+
+                Hasil ini merupakan perhitungan
+                antropometri berdasarkan standar
+                pertumbuhan WHO dan bukan diagnosis
+                medis.
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- ERROR -->
+
+          <div
+            v-else
+            class="who-empty"
+          >
+
+            Belum ada hasil perhitungan.
+
+          </div>
+
+        </div>
+
+
+
+        
         <!-- =====================================================
              TABS
         ====================================================== -->
@@ -301,8 +496,7 @@
 
         <div
           v-if="activeTab === 'histori'"
-          class="dashboard-panel"
-        >
+          class="dashboard-panel" style="margin-top: 10px;">
 
           <div class="panel-header">
 
@@ -313,7 +507,7 @@
               </h3>
 
               <p class="panel-description">
-                Riwayat hasil pengukuran balita
+                Riwayat hasil pengukuran pra-sekolah
               </p>
 
             </div>
@@ -545,8 +739,7 @@
 
         <div
           v-if="activeTab === 'pemantauan'"
-          class="dashboard-panel"
-        >
+          class="dashboard-panel" style="margin-top: 10px;">
 
           <div class="panel-header">
 
@@ -1243,7 +1436,7 @@
 
             <p>
               Data pengukuran dan pemberian layanan akan
-              tersimpan sebagai histori pemeriksaan balita.
+              tersimpan sebagai histori pemeriksaan pra-sekolah.
             </p>
 
           </div>
@@ -1497,7 +1690,7 @@ const loadBalita =
       if (!responseBalita.ok) {
 
         throw new Error(
-          'Data balita tidak ditemukan.'
+          'Data anak tidak ditemukan.'
         )
 
       }
@@ -1513,7 +1706,7 @@ const loadBalita =
       ) {
 
         throw new Error(
-          'Data balita tidak ditemukan.'
+          'Data anak tidak ditemukan.'
         )
 
       }
@@ -1560,12 +1753,12 @@ const loadBalita =
     catch (error) {
 
       console.error(
-        'Gagal mengambil data balita:',
+        'Gagal mengambil data anak:',
         error
       )
 
       alert(
-        'Data balita gagal dimuat dari server.'
+        'Data anak gagal dimuat dari server.'
       )
 
     }
