@@ -126,16 +126,6 @@
           </div>
         </div>
 
-        <!-- AKSES CEPAT -->
-        <div class="dashboard-grid">
-          <div class="dashboard-panel">
-            <div class="panel-header"><h3>Akses Cepat</h3></div>
-            <router-link to="/balita" class="quick-button">
-              👶
-              <span><strong>Data Balita</strong><small>Lihat dan kelola data anak</small></span>
-            </router-link>
-          </div>
-        </div>
 
         <!-- GRAFIK STATUS -->
         <div class="dashboard-panel">
@@ -724,7 +714,7 @@ const pemeriksaanTerbaru = computed(() => {
 })
 
 /* PAGINATION */
-const itemPerHalaman = 10
+const itemPerHalaman = 5
 const halamanPemeriksaanTerbaru = ref(1)
 
 const totalHalamanPemeriksaanTerbaru = computed(() => Math.max(
